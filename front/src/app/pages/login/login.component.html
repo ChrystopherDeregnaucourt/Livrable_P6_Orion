@@ -15,25 +15,15 @@
   <!-- Contenu du formulaire - centré -->
   <div class="form-page-content-wrapper">
     <div class="form-page-content-section">
-      <h2 class="form-page-title">Inscription</h2>
+      <h2 class="form-page-title">Se connecter</h2>
 
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="form-page-form">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-page-form">
         <div class="form-page-field">
-          <label for="username">Nom d'utilisateur</label>
+          <label for="emailOrUsername">E-mail ou nom d'utilisateur</label>
           <input
             type="text"
-            id="username"
-            formControlName="username"
-            class="form-page-input"
-          />
-        </div>
-
-        <div class="form-page-field">
-          <label for="email">Adresse e-mail</label>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
+            id="emailOrUsername"
+            formControlName="emailOrUsername"
             class="form-page-input"
           />
         </div>
@@ -53,9 +43,10 @@
           color="primary"
           type="submit"
           class="form-page-submit-button"
-          [disabled]="!registerForm.valid"
+          (click)="navigateToArticles()"
+          [disabled]="!loginForm.valid"
         >
-          S'inscrire
+          Se connecter
         </button>
       </form>
     </div>

@@ -1,0 +1,13 @@
+// Styles spécifiques à la page Articles
+// Les styles communs sont dans _nav-pages.scss et _cards.scss
+
+/* Article Card spécifique - hauteur fixe */
+.article-card {
+  height: 280px;
+  
+  @media (max-width: 768px) {
+    height: auto;
+    min-height: 220px;
+    width: 100%;
+  }
+}

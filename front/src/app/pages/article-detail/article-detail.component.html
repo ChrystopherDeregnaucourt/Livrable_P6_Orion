@@ -1,0 +1,108 @@
+<div class="nav-page-container">
+  <!-- Header Navigation -->
+  <header class="nav-page-header">
+    <div class="header-left">
+      <img src="/assets/logo_p6.png" alt="MDD Logo" class="logo" />
+    </div>
+    
+    <!-- Desktop Navigation -->
+    <nav class="nav-desktop">
+      <button mat-button class="nav-button disconnect-btn" (click)="onDisconnect()">
+        Se déconnecter
+      </button>
+      <button mat-button class="nav-button" (click)="onNavigateToArticles()">
+        Articles
+      </button>
+      <button mat-button class="nav-button" (click)="onNavigateToThemes()">
+        Thèmes
+      </button>
+      <button class="profile-btn" (click)="onNavigateToProfile()">
+        <img src="/assets/UserProfil.png" alt="Profil" class="profile-img" />
+      </button>
+    </nav>
+
+    <!-- Mobile Menu Button -->
+    <div class="mobile-menu">
+      <button mat-icon-button class="menu-btn" (click)="toggleMobileMenu()">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-overlay" [class.show]="isMobileMenuOpen" (click)="toggleMobileMenu()"></div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div class="mobile-dropdown" [class.show]="isMobileMenuOpen">
+      <div class="mobile-nav-content">
+        <button mat-button class="mobile-nav-item" (click)="onDisconnect()">
+          Se déconnecter
+        </button>
+        <button mat-button class="mobile-nav-item" (click)="onNavigateToArticles()">
+          Articles
+        </button>
+        <button mat-button class="mobile-nav-item" (click)="onNavigateToThemes()">
+          Thèmes
+        </button>
+      </div>
+      <div class="mobile-profile-section">
+        <button class="mobile-profile-btn" (click)="onNavigateToProfile()">
+          <img src="/assets/UserProfil.png" alt="Profil" class="profile-img" />
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content Area -->
+  <main class="nav-page-content">
+    <div class="article-detail-container">
+      <!-- Back Button -->
+      <button mat-icon-button class="back-btn" (click)="onGoBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      <!-- Article Header -->
+      <div class="article-detail-header">
+        <h1 class="article-detail-title">{{ article.title }}</h1>
+        <div class="article-detail-meta">
+          <span class="article-detail-date">{{ article.date | date:'dd/MM/yyyy' }}</span>
+          <span class="article-detail-author">{{ article.author }}</span>
+        </div>
+        <div class="article-detail-theme">{{ article.theme }}</div>
+      </div>
+
+      <!-- Article Content -->
+      <div class="article-detail-content">
+        <p>{{ article.content }}</p>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="comments-section">
+        <h2 class="comments-title">Commentaires</h2>
+        
+        <div class="comment-item" *ngFor="let comment of comments; trackBy: trackByCommentId">
+          <div class="comment-header">
+            <span class="comment-username">{{ comment.username }}</span>
+          </div>
+          <div class="comment-content">
+            {{ comment.content }}
+          </div>
+        </div>
+
+        <!-- Comment Form -->
+        <form class="comment-form" (ngSubmit)="onSubmitComment()">
+          <textarea 
+            class="comment-input" 
+            placeholder="Écrivez ici votre commentaire"
+            [(ngModel)]="newComment"
+            name="comment"
+            rows="4"
+            required>
+          </textarea>
+          <button mat-icon-button type="submit" class="comment-submit-btn" [disabled]="!newComment || newComment.trim().length === 0">
+            <mat-icon>send</mat-icon>
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>

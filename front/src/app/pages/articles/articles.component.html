@@ -1,0 +1,94 @@
+<div class="nav-page-container">
+  <!-- Header Navigation -->
+  <header class="nav-page-header">
+    <div class="header-left">
+      <img src="/assets/logo_p6.png" alt="MDD Logo" class="logo" />
+    </div>
+    
+    <!-- Desktop Navigation -->
+    <nav class="nav-desktop">
+      <button mat-button class="nav-button disconnect-btn" (click)="onDisconnect()">
+        Se déconnecter
+      </button>
+      <button mat-button class="nav-button active" (click)="onNavigateToArticles()">
+        Articles
+      </button>
+      <button mat-button class="nav-button" (click)="onNavigateToThemes()">
+        Thèmes
+      </button>
+      <button class="profile-btn" (click)="onNavigateToProfile()">
+        <img src="/assets/UserProfil.png" alt="Profil" class="profile-img" />
+      </button>
+    </nav>
+
+    <!-- Mobile Menu Button -->
+    <div class="mobile-menu">
+      <button mat-icon-button class="menu-btn" (click)="toggleMobileMenu()">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-overlay" [class.show]="isMobileMenuOpen" (click)="toggleMobileMenu()"></div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div class="mobile-dropdown" [class.show]="isMobileMenuOpen">
+      <div class="mobile-nav-content">
+        <button mat-button class="mobile-nav-item" (click)="onDisconnect()">
+          Se déconnecter
+        </button>
+        <button mat-button class="mobile-nav-item active" (click)="onNavigateToArticles()">
+          Articles
+        </button>
+        <button mat-button class="mobile-nav-item" (click)="onNavigateToThemes()">
+          Thèmes
+        </button>
+      </div>
+      <div class="mobile-profile-section">
+        <button class="mobile-profile-btn" (click)="onNavigateToProfile()">
+          <img src="/assets/UserProfil.png" alt="Profil" class="profile-img" />
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content Area -->
+  <main class="nav-page-content">
+    <!-- Action Buttons -->
+    <div class="action-bar">
+      <button mat-raised-button color="primary" class="create-btn" (click)="onCreateArticle()">
+        Créer un article
+      </button>
+      <div class="sort-section">
+        <button mat-button class="sort-btn" [matMenuTriggerFor]="sortMenu">
+          Trier par
+          <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+        <mat-menu #sortMenu="matMenu">
+          <button mat-menu-item (click)="onSort('date')">Date</button>
+          <button mat-menu-item (click)="onSort('title')">Titre</button>
+          <button mat-menu-item (click)="onSort('author')">Auteur</button>
+        </mat-menu>
+      </div>
+    </div>
+
+    <!-- Articles Grid -->
+    <div class="content-grid">
+      <div class="base-card article-card" 
+           *ngFor="let article of articles; trackBy: trackByArticleId"
+           (click)="onArticleClick(article.id)"
+           style="cursor: pointer;">
+        <div class="card-header">
+          <h3 class="card-title">{{ article.title }}</h3>
+          <div class="card-meta">
+            <span class="card-date">{{ article.date | date:'dd/MM/yyyy' }}</span>
+            <span class="card-author">{{ article.author }}</span>
+          </div>
+        </div>
+        <div class="card-content">
+          <p>{{ article.content }}</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
