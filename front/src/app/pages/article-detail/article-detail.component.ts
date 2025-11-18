@@ -75,8 +75,7 @@ export class ArticleDetailComponent implements OnInit {
 
   onNavigateToProfile(): void {
     this.isMobileMenuOpen = false;
-    // TODO: Navigate to profile page when created
-    console.log('Navigation vers profil à implémenter');
+    this.router.navigate(['/profile']);
   }
 
   onGoBack(): void {

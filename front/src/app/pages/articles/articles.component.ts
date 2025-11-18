@@ -71,7 +71,7 @@ export class ArticlesComponent implements OnInit {
   onDisconnect(): void {
     // TODO: Implémenter la déconnexion
     console.log('Déconnexion');
-    this.router.navigate(['/home']);
+    this.router.navigate(['/']);
   }
 
   onNavigateToArticles(): void {
@@ -85,9 +85,8 @@ export class ArticlesComponent implements OnInit {
   }
 
   onNavigateToProfile(): void {
-    // TODO: Naviguer vers la page profil quand elle sera créée
-    console.log('Navigation vers Profil');
     this.isMobileMenuOpen = false;
+    this.router.navigate(['/profile']);
   }
 
   onCreateArticle(): void {

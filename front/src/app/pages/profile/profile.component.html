@@ -1,0 +1,102 @@
+<div class="nav-page-container">
+  <!-- Header Navigation -->
+  <header class="nav-page-header">
+    <div class="header-left">
+      <img src="/assets/logo_p6.png" alt="MDD Logo" class="logo" />
+    </div>
+
+    <!-- Desktop Navigation -->
+    <nav class="nav-desktop">
+      <button mat-button class="nav-button disconnect-btn" (click)="onDisconnect()">
+        Se déconnecter
+      </button>
+      <button mat-button class="nav-button" (click)="onNavigateToArticles()">
+        Articles
+      </button>
+      <button mat-button class="nav-button" (click)="onNavigateToThemes()">
+        Thèmes
+      </button>
+      <button class="profile-btn" aria-current="page">
+        <img src="/assets/UserProfil.png" alt="Profil" class="profile-img" />
+      </button>
+    </nav>
+
+    <!-- Mobile Menu Button -->
+    <div class="mobile-menu">
+      <button mat-icon-button class="menu-btn" (click)="toggleMobileMenu()">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-overlay" [class.show]="isMobileMenuOpen" (click)="toggleMobileMenu()"></div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div class="mobile-dropdown" [class.show]="isMobileMenuOpen">
+      <div class="mobile-nav-content">
+        <button mat-button class="mobile-nav-item" (click)="onDisconnect()">
+          Se déconnecter
+        </button>
+        <button mat-button class="mobile-nav-item" (click)="onNavigateToArticles()">
+          Articles
+        </button>
+        <button mat-button class="mobile-nav-item" (click)="onNavigateToThemes()">
+          Thèmes
+        </button>
+      </div>
+      <div class="mobile-profile-section">
+        <button class="mobile-profile-btn" aria-current="page">
+          <img src="/assets/UserProfil.png" alt="Profil" class="profile-img" />
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content Area -->
+  <main class="nav-page-content profile-content">
+    <div class="profile-card">
+      <section class="profile-section">
+        <h1 class="profile-title">Profil utilisateur</h1>
+        <form class="profile-form" [formGroup]="profileForm" (ngSubmit)="onSave()">
+          <input
+            type="text"
+            class="profile-input"
+            placeholder="Username"
+            formControlName="username"
+            aria-label="Nom d'utilisateur"
+          />
+          <input
+            type="email"
+            class="profile-input"
+            placeholder="email@mail.fr"
+            formControlName="email"
+            aria-label="Adresse e-mail"
+          />
+          <input
+            type="password"
+            class="profile-input"
+            placeholder="Mot de passe"
+            formControlName="password"
+            aria-label="Mot de passe"
+          />
+          <button type="submit" class="save-button" [disabled]="!profileForm.valid">Sauvegarder</button>
+        </form>
+      </section>
+
+      <section class="subscriptions-section">
+        <h2 class="subscriptions-title">Abonnements</h2>
+        <div class="subscriptions-grid">
+          <div class="subscription-card" *ngFor="let subscription of subscriptions; trackBy: trackBySubscriptionId">
+            <div class="subscription-text">
+              <h3 class="subscription-name">{{ subscription.title }}</h3>
+              <p class="subscription-description">{{ subscription.description }}</p>
+            </div>
+            <button type="button" class="unsubscribe-button" (click)="onUnsubscribe(subscription.id)">
+              Se désabonner
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

@@ -20,7 +20,7 @@ export class ThemesComponent implements OnInit {
     {
       id: 1,
       title: 'Angular',
-      description: 'Tout sur le framework Angular et son écosystème',
+      description: 'Tout sur le framework Angular et son écosystème tttttttttttttttttttttttttffffffffffffffffffffffffffffffff rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy iuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg',
       isSubscribed: true
     },
     {
@@ -81,8 +81,7 @@ export class ThemesComponent implements OnInit {
 
   onNavigateToProfile(): void {
     this.isMobileMenuOpen = false;
-    // TODO: Navigate to profile page when created
-    console.log('Navigation vers profil à implémenter');
+    this.router.navigate(['/profile']);
   }
 
   toggleSubscription(theme: Theme): void {

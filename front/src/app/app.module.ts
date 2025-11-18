@@ -14,14 +14,15 @@ import { ArticlesComponent } from './pages/articles/articles.component';
 import { ThemesComponent } from './pages/themes/themes.component';
 import { ArticleDetailComponent } from './pages/article-detail/article-detail.component';
 import { CreateArticleComponent } from './pages/create-article/create-article.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 @NgModule({
   declarations: [
     AppComponent, 
-    HomeComponent, 
-    RegisterComponent, 
-    LoginComponent, 
-    ArticlesComponent, ThemesComponent, ArticleDetailComponent, CreateArticleComponent
+    HomeComponent,
+    RegisterComponent,
+    LoginComponent,
+    ArticlesComponent, ThemesComponent, ArticleDetailComponent, CreateArticleComponent, ProfileComponent
   ],
   imports: [
     BrowserModule,

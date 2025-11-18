@@ -55,19 +55,19 @@
   <!-- Content Area -->
   <main class="nav-page-content">
     <div class="article-detail-container">
-      <!-- Back Button -->
-      <button mat-icon-button class="back-btn" (click)="onGoBack()">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-
-      <!-- Article Header -->
+      <!-- Back Button & Title on same line -->
       <div class="article-detail-header">
+        <button mat-icon-button class="back-btn" (click)="onGoBack()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
         <h1 class="article-detail-title">{{ article.title }}</h1>
-        <div class="article-detail-meta">
-          <span class="article-detail-date">{{ article.date | date:'dd/MM/yyyy' }}</span>
-          <span class="article-detail-author">{{ article.author }}</span>
-        </div>
-        <div class="article-detail-theme">{{ article.theme }}</div>
+      </div>
+      
+      <!-- Date, Author, Theme -->
+      <div class="article-detail-meta">
+        <span class="article-detail-date">{{ article.date | date:'dd/MM/yyyy' }}</span>
+        <span class="article-detail-author">{{ article.author }}</span>
+        <span class="article-detail-theme">{{ article.theme }}</span>
       </div>
 
       <!-- Article Content -->
@@ -98,7 +98,7 @@
             rows="4"
             required>
           </textarea>
-          <button mat-icon-button type="submit" class="comment-submit-btn" [disabled]="!newComment || newComment.trim().length === 0">
+          <button type="submit" class="comment-submit-btn" [disabled]="!newComment || newComment.trim().length === 0">
             <mat-icon>send</mat-icon>
           </button>
         </form>
