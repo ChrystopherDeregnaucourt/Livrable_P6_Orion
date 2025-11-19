@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, BehaviorSubject, tap, take } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { User, LoginRequest, RegisterRequest, AuthResponse } from '../models';
 
@@ -60,7 +60,8 @@ export class AuthService {
   }
 
   private loadCurrentUser(): void {
-    this.getMe().subscribe({
+    //Take 1 pour éviter les abonnements multiples (fuites mémoire)
+    this.getMe().pipe(take(1)).subscribe({
       error: () => this.logout()
     });
   }
