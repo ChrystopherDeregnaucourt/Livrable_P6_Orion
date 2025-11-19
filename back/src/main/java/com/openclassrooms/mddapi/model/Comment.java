@@ -1,29 +1,36 @@
 package com.openclassrooms.mddapi.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.time.LocalDateTime;
+
+import javax.persistence.*;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import lombok.Data;
 
 @Entity
 @Table(name = "comments")
+@Data
+@EntityListeners(AuditingEntityListener.class)
 public class Comment {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "comment_id")
-	private Long id;
-	
-	// TODO : to finish...
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	public Long getId() {
-		return id;
-	}
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String content;
+    
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-	public void setId(Long id) {
-		this.id = id;
-	}	
-	
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User author;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
 }
