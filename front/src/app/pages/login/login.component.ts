@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -30,15 +32,18 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      // Récupération des valeurs du formulaire
       const { emailOrUsername, password } = this.loginForm.value;
       
-      // TODO: Implémenter la logique de connexion via un service d'authentification
-      console.log('Tentative de connexion:', { emailOrUsername, password });
-      
-      // Redirection temporaire vers home après connexion
-      // À remplacer par la logique d'authentification réelle
-      this.router.navigate(['/home']);
+      this.authService.login({ emailOrUsername, password }).subscribe({
+        next: (response) => {
+          console.log('Connexion réussie:', response.user);
+          this.router.navigate(['/articles']);
+        },
+        error: (error) => {
+          console.error('Erreur de connexion:', error);
+          alert('Identifiants invalides');
+        }
+      });
     }
   }
 

@@ -2,11 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
-
-interface Theme {
-  id: number;
-  name: string;
-}
+import { ApiService } from '../../services/api.service';
+import { Theme } from '../../models';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-create-article',
@@ -16,40 +14,57 @@ interface Theme {
 export class CreateArticleComponent implements OnInit {
   articleForm!: FormGroup;
   isMobileMenuOpen = false;
-  
-  // Mock themes - À remplacer par un appel API
-  themes: Theme[] = [
-    { id: 1, name: 'JavaScript' },
-    { id: 2, name: 'TypeScript' },
-    { id: 3, name: 'Angular' },
-    { id: 4, name: 'React' },
-    { id: 5, name: 'Vue.js' }
-  ];
+
+  themes: Theme[] = [];
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private apiService: ApiService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.articleForm = this.fb.group({
-      theme: ['', Validators.required],
+      themeId: ['', Validators.required],
       title: ['', [Validators.required, Validators.minLength(3)]],
       content: ['', [Validators.required, Validators.minLength(10)]]
+    });
+
+    this.loadThemes();
+  }
+
+  private loadThemes(): void {
+    this.apiService.getThemes().subscribe({
+      next: (themes) => {
+        this.themes = themes;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des thèmes', error);
+      }
     });
   }
 
   onSubmit(): void {
     if (this.articleForm.valid) {
       const formData = this.articleForm.value;
-      console.log('Article à créer:', formData);
-      
-      // TODO: Appel API pour créer l'article
-      // this.articleService.createArticle(formData).subscribe(...)
-      
-      // Redirection vers la liste des articles
-      this.router.navigate(['/articles']);
+
+      this.apiService.createArticle({
+        themeId: Number(formData.themeId),
+        title: formData.title,
+        content: formData.content
+      }).subscribe({
+        next: (article) => {
+          console.log('Article créé:', article);
+          alert('Article créé avec succès !');
+          this.router.navigate(['/articles']);
+        },
+        error: (error) => {
+          console.error('Erreur lors de la création de l\'article', error);
+          alert('Erreur lors de la création de l\'article');
+        }
+      });
     }
   }
 
@@ -62,8 +77,8 @@ export class CreateArticleComponent implements OnInit {
   }
 
   onDisconnect(): void {
-    // TODO: Appel API de déconnexion
-    this.router.navigate(['/login']);
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 
   onNavigateToArticles(): void {
@@ -81,4 +96,3 @@ export class CreateArticleComponent implements OnInit {
     this.router.navigate(['/profile']);
   }
 }
-

@@ -1,13 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
-interface Article {
-  id: number;
-  title: string;
-  content: string;
-  author: string;
-  date: Date;
-}
+import { ApiService } from '../../services/api.service';
+import { Article } from '../../models';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-articles',
@@ -19,45 +14,26 @@ export class ArticlesComponent implements OnInit {
   articles: Article[] = [];
   sortBy: 'date' | 'title' | 'author' = 'date';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private apiService: ApiService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.loadMockArticles();
+    this.loadArticles();
   }
 
-  private loadMockArticles(): void {
-    // Données de test en attendant l'API
-    this.articles = [
-      {
-        id: 1,
-        title: 'Titre de l\'article',
-        content: 'Content lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled...',
-        author: 'Auteur',
-        date: new Date('2024-01-15')
+  private loadArticles(): void {
+    this.apiService.getArticles().subscribe({
+      next: (articles) => {
+        this.articles = articles;
+        this.sortArticles();
       },
-      {
-        id: 2,
-        title: 'Titre de l\'article',
-        content: 'Content lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled...',
-        author: 'Auteur',
-        date: new Date('2024-01-20')
-      },
-      {
-        id: 3,
-        title: 'Titre de l\'article',
-        content: 'Content lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled...',
-        author: 'Auteur',
-        date: new Date('2024-01-10')
-      },
-      {
-        id: 4,
-        title: 'Titre de l\'article',
-        content: 'Content lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled...',
-        author: 'Auteur',
-        date: new Date('2024-01-25')
+      error: (error) => {
+        console.error('Erreur lors du chargement des articles', error);
       }
-    ];
-    this.sortArticles();
+    });
   }
 
   trackByArticleId(index: number, article: Article): number {
@@ -69,8 +45,7 @@ export class ArticlesComponent implements OnInit {
   }
 
   onDisconnect(): void {
-    // TODO: Implémenter la déconnexion
-    console.log('Déconnexion');
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 
@@ -105,7 +80,7 @@ export class ArticlesComponent implements OnInit {
   private sortArticles(): void {
     switch (this.sortBy) {
       case 'date':
-        this.articles.sort((a, b) => b.date.getTime() - a.date.getTime());
+        this.articles.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         break;
       case 'title':
         this.articles.sort((a, b) => a.title.localeCompare(b.title));

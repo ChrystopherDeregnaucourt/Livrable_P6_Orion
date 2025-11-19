@@ -157,10 +157,8 @@
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
+  box-shadow: none;
   
-  &:hover {
-    box-shadow: none;
-  }
   
   /* Bouton à l'état "accent" (ex: déjà abonné) en gris */
   &.mat-accent {

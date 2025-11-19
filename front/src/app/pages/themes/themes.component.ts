@@ -1,12 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
-export interface Theme {
-  id: number;
-  title: string;
-  description: string;
-  isSubscribed: boolean;
-}
+import { ApiService } from '../../services/api.service';
+import { Theme } from '../../models';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-themes',
@@ -15,49 +11,28 @@ export interface Theme {
 })
 export class ThemesComponent implements OnInit {
   isMobileMenuOpen = false;
-  
-  themes: Theme[] = [
-    {
-      id: 1,
-      title: 'Angular',
-      description: 'Tout sur le framework Angular et son écosystème tttttttttttttttttttttttttffffffffffffffffffffffffffffffff rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy iuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg',
-      isSubscribed: true
-    },
-    {
-      id: 2,
-      title: 'React',
-      description: 'Découvrez React et ses meilleures pratiques',
-      isSubscribed: false
-    },
-    {
-      id: 3,
-      title: 'Vue.js',
-      description: 'Le framework progressif pour construire des interfaces utilisateur',
-      isSubscribed: false
-    },
-    {
-      id: 4,
-      title: 'TypeScript',
-      description: 'JavaScript typé pour des applications plus robustes',
-      isSubscribed: true
-    },
-    {
-      id: 5,
-      title: 'Node.js',
-      description: 'Le runtime JavaScript côté serveur',
-      isSubscribed: false
-    },
-    {
-      id: 6,
-      title: 'Spring Boot',
-      description: 'Framework Java pour créer des applications robustes',
-      isSubscribed: false
-    }
-  ];
 
-  constructor(private router: Router) { }
+  themes: Theme[] = [];
+
+  constructor(
+    private router: Router,
+    private apiService: ApiService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
+    this.loadThemes();
+  }
+
+  private loadThemes(): void {
+    this.apiService.getThemes().subscribe({
+      next: (themes) => {
+        this.themes = themes;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des thèmes', error);
+      }
+    });
   }
 
   toggleMobileMenu(): void {
@@ -66,6 +41,7 @@ export class ThemesComponent implements OnInit {
 
   onDisconnect(): void {
     this.isMobileMenuOpen = false;
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 
@@ -85,7 +61,29 @@ export class ThemesComponent implements OnInit {
   }
 
   toggleSubscription(theme: Theme): void {
-    theme.isSubscribed = !theme.isSubscribed;
+    const wasSubscribed = theme.isSubscribed;
+    
+    if (wasSubscribed) {
+      this.apiService.unsubscribeFromTopic(theme.id).subscribe({
+        next: () => {
+          theme.isSubscribed = false;
+          console.log('Désabonné du thème:', theme.title);
+        },
+        error: (error) => {
+          console.error('Erreur lors du désabonnement:', error);
+        }
+      });
+    } else {
+      this.apiService.subscribeToTopic(theme.id).subscribe({
+        next: () => {
+          theme.isSubscribed = true;
+          console.log('Abonné au thème:', theme.title);
+        },
+        error: (error) => {
+          console.error('Erreur lors de l\'abonnement:', error);
+        }
+      });
+    }
   }
 
   trackByThemeId(index: number, theme: Theme): number {

@@ -55,25 +55,24 @@
   <!-- Content Area -->
   <main class="nav-page-content">
     <div class="create-article-container">
-      <!-- Back Button -->
-      <button mat-icon-button class="back-btn" (click)="onGoBack()">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-
-      <!-- Title -->
-      <h1 class="page-title">Créer un nouvel article</h1>
+      <!-- Header with Back Button and Title -->
+      <div class="header-with-back">
+        <button mat-icon-button class="back-btn" (click)="onGoBack()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1 class="page-title">Créer un nouvel article</h1>
+      </div>
 
       <!-- Form -->
       <form [formGroup]="articleForm" (ngSubmit)="onSubmit()" class="article-form">
         <!-- Theme Select -->
         <div class="form-field">
-          <select 
-            class="form-select" 
+          <input 
+            type="text" 
+            class="form-input" 
+            placeholder="Sélectionner un thème"
             formControlName="theme"
             [class.error]="articleForm.get('theme')?.invalid && articleForm.get('theme')?.touched">
-            <option value="" disabled>Sélectionner un thème</option>
-            <option *ngFor="let theme of themes" [value]="theme.id">{{ theme.name }}</option>
-          </select>
         </div>
 
         <!-- Title Input -->

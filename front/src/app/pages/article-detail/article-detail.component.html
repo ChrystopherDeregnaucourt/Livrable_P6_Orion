@@ -53,7 +53,7 @@
   </header>
 
   <!-- Content Area -->
-  <main class="nav-page-content">
+  <main class="nav-page-content" *ngIf="article">
     <div class="article-detail-container">
       <!-- Back Button & Title on same line -->
       <div class="article-detail-header">
@@ -62,7 +62,7 @@
         </button>
         <h1 class="article-detail-title">{{ article.title }}</h1>
       </div>
-      
+
       <!-- Date, Author, Theme -->
       <div class="article-detail-meta">
         <span class="article-detail-date">{{ article.date | date:'dd/MM/yyyy' }}</span>

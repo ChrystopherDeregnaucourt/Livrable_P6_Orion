@@ -1,21 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
-
-export interface Article {
-  id: number;
-  title: string;
-  date: Date;
-  author: string;
-  theme: string;
-  content: string;
-}
-
-export interface Comment {
-  id: number;
-  username: string;
-  content: string;
-}
+import { ApiService } from '../../services/api.service';
+import { ArticleDetail, Comment } from '../../models';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-article-detail',
@@ -25,33 +13,35 @@ export interface Comment {
 export class ArticleDetailComponent implements OnInit {
   isMobileMenuOpen = false;
   newComment = '';
-  
-  article: Article = {
-    id: 1,
-    title: 'Titre de l\'article sélectionné',
-    date: new Date(),
-    author: 'Auteur',
-    theme: 'Thème',
-    content: 'Content: lorem ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.'
-  };
 
-  comments: Comment[] = [
-    {
-      id: 1,
-      username: 'username',
-      content: 'contenu du commentaire'
-    }
-  ];
+  article: ArticleDetail | null = null;
+  comments: Comment[] = [];
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private apiService: ApiService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
-    // TODO: Récupérer l'ID de l'article depuis la route et charger les données
-    // const articleId = this.route.snapshot.paramMap.get('id');
+    const articleId = Number(this.route.snapshot.paramMap.get('id'));
+    if (articleId) {
+      this.loadArticle(articleId);
+    }
+  }
+
+  private loadArticle(articleId: number): void {
+    this.apiService.getArticle(articleId).subscribe({
+      next: (article) => {
+        this.article = article;
+        this.comments = article.comments || [];
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement de l\'article', error);
+      }
+    });
   }
 
   toggleMobileMenu(): void {
@@ -60,6 +50,7 @@ export class ArticleDetailComponent implements OnInit {
 
   onDisconnect(): void {
     this.isMobileMenuOpen = false;
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 
@@ -83,14 +74,17 @@ export class ArticleDetailComponent implements OnInit {
   }
 
   onSubmitComment(): void {
-    if (this.newComment && this.newComment.trim().length > 0) {
-      const newCommentObj: Comment = {
-        id: this.comments.length + 1,
-        username: 'Utilisateur actuel', // TODO: Récupérer le username de l'utilisateur connecté
-        content: this.newComment.trim()
-      };
-      this.comments.push(newCommentObj);
-      this.newComment = '';
+    if (this.newComment && this.newComment.trim().length > 0 && this.article) {
+      this.apiService.addComment(this.article.id, this.newComment.trim()).subscribe({
+        next: (newComment) => {
+          this.comments.push(newComment);
+          this.newComment = '';
+          console.log('Commentaire ajouté:', newComment);
+        },
+        error: (error) => {
+          console.error('Erreur lors de l\'ajout du commentaire:', error);
+        }
+      });
     }
   }
 
