@@ -2,8 +2,13 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  createdAt?: string;
-  subscriptions?: any[];
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  subscriptions?: Array<{
+    id: number;
+    title: string;
+    description: string;
+  }>;
 }
 
 export interface LoginRequest {

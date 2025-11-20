@@ -1,5 +1,7 @@
 package com.openclassrooms.mddapi.controller;
 
+import java.time.LocalDateTime;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +46,7 @@ public class AuthController {
 
     @Autowired
     private JwtUtils jwtUtils;
-    
+
     @Autowired
     private IUserService userService; // Ajouté pour gérer le profil (/me)
 
@@ -68,6 +70,7 @@ public class AuthController {
         user.setUsername(signUpRequest.getUsername());
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(encoder.encode(signUpRequest.getPassword()));
+        user.setCreatedAt(LocalDateTime.now()); // Initialisation manuelle de la date de création
 
         userRepository.save(user);
 
@@ -77,27 +80,33 @@ public class AuthController {
     // --- LOGIN ---
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmailOrUsername(),
+                            loginRequest.getPassword()));
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmailOrUsername(), loginRequest.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-        
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();        
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        return ResponseEntity.ok(new JwtResponse(jwt, 
-                                                 userDetails.getId(), 
-                                                 userDetails.getUsername(), 
-                                                 userDetails.getEmail()));
+            return ResponseEntity.ok(new JwtResponse(jwt,
+                    userDetails.getId(),
+                    userDetails.getUsername(),
+                    userDetails.getEmail()));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(401)
+                    .body(new MessageResponse("Error: Invalid email/username or password!"));
+        }
     }
-    
+
     // --- ME (Profil Utilisateur) ---
     @GetMapping("/me")
     public ResponseEntity<?> me() {
         // Récupération de l'utilisateur connecté via le contexte de sécurité
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
+
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
@@ -106,21 +115,20 @@ public class AuthController {
 
         if (principal instanceof UserDetails) {
             UserDetailsImpl userDetails = (UserDetailsImpl) principal;
-            
+
             // On récupère l'entité complète via le service pour avoir les dates à jour
             User user = userService.findById(userDetails.getId());
-            
+
             if (user != null) {
                 return ResponseEntity.ok(new UserDto(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getCreatedAt(),
-                    user.getUpdatedAt()
-                ));
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getCreatedAt(),
+                        user.getUpdatedAt()));
             }
         }
-        
+
         return ResponseEntity.notFound().build();
     }
 }

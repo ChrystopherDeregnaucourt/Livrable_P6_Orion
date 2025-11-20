@@ -61,13 +61,13 @@ export class ThemesComponent implements OnInit {
   }
 
   toggleSubscription(theme: Theme): void {
-    const wasSubscribed = theme.isSubscribed;
+    const wasSubscribed = theme.subscribed;
     
     if (wasSubscribed) {
       this.apiService.unsubscribeFromTopic(theme.id).subscribe({
         next: () => {
-          theme.isSubscribed = false;
-          console.log('Désabonné du thème:', theme.title);
+          theme.subscribed = false;
+          console.log('Désabonné du thème:', theme.name);
         },
         error: (error) => {
           console.error('Erreur lors du désabonnement:', error);
@@ -76,8 +76,8 @@ export class ThemesComponent implements OnInit {
     } else {
       this.apiService.subscribeToTopic(theme.id).subscribe({
         next: () => {
-          theme.isSubscribed = true;
-          console.log('Abonné au thème:', theme.title);
+          theme.subscribed = true;
+          console.log('Abonné au thème:', theme.name);
         },
         error: (error) => {
           console.error('Erreur lors de l\'abonnement:', error);
