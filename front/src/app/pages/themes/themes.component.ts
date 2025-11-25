@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { Theme } from '../../models';
 import { AuthService } from '../../services/auth.service';
@@ -7,12 +9,14 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-themes',
   templateUrl: './themes.component.html',
-  styleUrls: ['./themes.component.scss']
+  styleUrls: ['./themes.component.scss'],
+  standalone: false
 })
-export class ThemesComponent implements OnInit {
+export class ThemesComponent implements OnInit, OnDestroy {
   isMobileMenuOpen = false;
 
   themes: Theme[] = [];
+  private destroy$ = new Subject<void>();
 
   constructor(
     private router: Router,
@@ -24,15 +28,22 @@ export class ThemesComponent implements OnInit {
     this.loadThemes();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadThemes(): void {
-    this.apiService.getThemes().subscribe({
-      next: (themes) => {
-        this.themes = themes;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des thèmes', error);
-      }
-    });
+    this.apiService.getThemes()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (themes) => {
+          this.themes = themes;
+        },
+        error: (error) => {
+          console.error('Erreur lors du chargement des thèmes', error);
+        }
+      });
   }
 
   toggleMobileMenu(): void {
@@ -64,25 +75,31 @@ export class ThemesComponent implements OnInit {
     const wasSubscribed = theme.subscribed;
     
     if (wasSubscribed) {
-      this.apiService.unsubscribeFromTopic(theme.id).subscribe({
-        next: () => {
-          theme.subscribed = false;
-          console.log('Désabonné du thème:', theme.name);
-        },
-        error: (error) => {
-          console.error('Erreur lors du désabonnement:', error);
-        }
-      });
+      this.apiService.unsubscribeFromTopic(theme.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            theme.subscribed = false;
+            // Recharger l'utilisateur pour mettre à jour ses abonnements
+            this.authService.getMe().pipe(takeUntil(this.destroy$)).subscribe();
+          },
+          error: (error) => {
+            console.error('Erreur lors du désabonnement:', error);
+          }
+        });
     } else {
-      this.apiService.subscribeToTopic(theme.id).subscribe({
-        next: () => {
-          theme.subscribed = true;
-          console.log('Abonné au thème:', theme.name);
-        },
-        error: (error) => {
-          console.error('Erreur lors de l\'abonnement:', error);
-        }
-      });
+      this.apiService.subscribeToTopic(theme.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            theme.subscribed = true;
+            // Recharger l'utilisateur pour mettre à jour ses abonnements
+            this.authService.getMe().pipe(takeUntil(this.destroy$)).subscribe();
+          },
+          error: (error) => {
+            console.error('Erreur lors de l\'abonnement:', error);
+          }
+        });
     }
   }
 

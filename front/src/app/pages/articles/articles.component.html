@@ -81,8 +81,8 @@
         <div class="card-header">
           <h3 class="card-title">{{ article.title }}</h3>
           <div class="card-meta">
-            <span class="card-date">{{ article.date | date:'dd/MM/yyyy' }}</span>
-            <span class="card-author">{{ article.author }}</span>
+            <span class="card-date">{{ article.created_at | date:'dd/MM/yyyy' }}</span>
+            <span class="card-author">{{ article.authorName }}</span>
           </div>
         </div>
         <div class="card-content">

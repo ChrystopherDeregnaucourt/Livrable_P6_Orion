@@ -1,134 +1,106 @@
 package com.openclassrooms.mddapi.controller;
 
-import java.time.LocalDateTime;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.openclassrooms.mddapi.dto.AuthResponse;
+import com.openclassrooms.mddapi.dto.LoginRequest;
+import com.openclassrooms.mddapi.dto.MessageResponse;
+import com.openclassrooms.mddapi.dto.RegisterRequest;
+import com.openclassrooms.mddapi.dto.UserResponse;
+import com.openclassrooms.mddapi.entity.User;
+import com.openclassrooms.mddapi.repository.UserRepository;
+import com.openclassrooms.mddapi.security.CustomUserDetails;
+import com.openclassrooms.mddapi.security.JwtService;
+import com.openclassrooms.mddapi.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
-import com.openclassrooms.mddapi.model.User;
-import com.openclassrooms.mddapi.payload.request.LoginRequest;
-import com.openclassrooms.mddapi.payload.request.RegisterRequest;
-import com.openclassrooms.mddapi.payload.response.JwtResponse;
-import com.openclassrooms.mddapi.payload.response.MessageResponse;
-import com.openclassrooms.mddapi.payload.response.UserDto;
-import com.openclassrooms.mddapi.repository.UserRepository;
-import com.openclassrooms.mddapi.security.jwt.JwtUtils;
-import com.openclassrooms.mddapi.security.services.UserDetailsImpl;
-import com.openclassrooms.mddapi.service.IUserService;
-
-@CrossOrigin(origins = "*", maxAge = 3600)
+/**
+ * Contrôleur pour l'authentification (inscription, connexion, infos utilisateur)
+ */
 @RestController
 @RequestMapping("/api/auth")
-public class AuthController {
+public class AuthController
+{
+    private final UserService userService;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    public AuthController(UserService userService, JwtService jwtService, AuthenticationManager authenticationManager, UserRepository userRepository)
+    {
+        this.userService = userService;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+    }
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder encoder;
-
-    @Autowired
-    private JwtUtils jwtUtils;
-
-    @Autowired
-    private IUserService userService; // Ajouté pour gérer le profil (/me)
-
-    // --- REGISTER ---
+    /**
+     * Endpoint pour l'inscription d'un nouvel utilisateur
+     */
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request)
+    {
+        try
+        {
+            // Crée l'utilisateur
+            User user = userService.createUser(request);
+
+            // Génère un token JWT
+            String token = jwtService.generateToken(user.getEmail());
+
+            // Retourne le token
+            return ResponseEntity.ok(new AuthResponse(token));
         }
-
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
+        catch (IllegalArgumentException e)
+        {
+            // En cas d'erreur (email ou username déjà utilisé)
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }
-
-        // Création du compte
-        User user = new User();
-        user.setUsername(signUpRequest.getUsername());
-        user.setEmail(signUpRequest.getEmail());
-        user.setPassword(encoder.encode(signUpRequest.getPassword()));
-        user.setCreatedAt(LocalDateTime.now()); // Initialisation manuelle de la date de création
-
-        userRepository.save(user);
-
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
-    // --- LOGIN ---
+    /**
+     * Endpoint pour la connexion
+     */
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        try {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request)
+    {
+        try
+        {
+            // Authentifie l'utilisateur
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmailOrUsername(),
-                            loginRequest.getPassword()));
+                    new UsernamePasswordAuthenticationToken(request.getEmailOrUsername(), request.getPassword())
+            );
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtils.generateJwtToken(authentication);
+            // Récupère l'email depuis les détails de l'utilisateur authentifié
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String email = userDetails.getUsername();
 
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            // Génère un token JWT
+            String token = jwtService.generateToken(email);
 
-            return ResponseEntity.ok(new JwtResponse(jwt,
-                    userDetails.getId(),
-                    userDetails.getUsername(),
-                    userDetails.getEmail()));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(401)
-                    .body(new MessageResponse("Error: Invalid email/username or password!"));
+            return ResponseEntity.ok(new AuthResponse(token));
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(401).body(new MessageResponse("Identifiants invalides"));
         }
     }
 
-    // --- ME (Profil Utilisateur) ---
+    /**
+     * Endpoint pour récupérer les informations de l'utilisateur connecté
+     */
     @GetMapping("/me")
-    public ResponseEntity<?> me() {
-        // Récupération de l'utilisateur connecté via le contexte de sécurité
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails)
+    {
+        // Récupère l'utilisateur depuis la base AVEC ses abonnements
+        User user = userRepository.findByEmailWithSubscriptions(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable"));
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(401).build();
-        }
-
-        Object principal = authentication.getPrincipal();
-
-        if (principal instanceof UserDetails) {
-            UserDetailsImpl userDetails = (UserDetailsImpl) principal;
-
-            // On récupère l'entité complète via le service pour avoir les dates à jour
-            User user = userService.findById(userDetails.getId());
-
-            if (user != null) {
-                return ResponseEntity.ok(new UserDto(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getCreatedAt(),
-                        user.getUpdatedAt()));
-            }
-        }
-
-        return ResponseEntity.notFound().build();
+        // Convertit en DTO et retourne
+        return ResponseEntity.ok(userService.toResponse(user));
     }
 }

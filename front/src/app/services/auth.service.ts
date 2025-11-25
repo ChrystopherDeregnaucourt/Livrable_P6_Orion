@@ -11,13 +11,24 @@ export class AuthService {
   private readonly baseUrl = environment.apiUrl;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  private userLoaded = false;
 
   constructor(private http: HttpClient) {
-    // Récupérer le token au démarrage si disponible
+    // Ne pas charger l'utilisateur ici pour éviter la dépendance circulaire
+  }
+
+  // Méthode à appeler pour initialiser l'utilisateur si un token existe
+  initializeUser(): void {
+    if (this.userLoaded) {
+      return;
+    }
+    
     const token = this.getToken();
+    console.log('AuthService initializeUser - Token présent:', !!token);
     if (token) {
       this.loadCurrentUser();
     }
+    this.userLoaded = true;
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
@@ -53,7 +64,7 @@ export class AuthService {
   }
 
   updateMe(userData: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.baseUrl}/auth/me`, userData)
+    return this.http.put<User>(`${this.baseUrl}/users/me`, userData)
       .pipe(
         tap(user => this.currentUserSubject.next(user))
       );
@@ -61,8 +72,13 @@ export class AuthService {
 
   private loadCurrentUser(): void {
     //Take 1 pour éviter les abonnements multiples (fuites mémoire)
+    console.log('AuthService - Chargement de l\'utilisateur...');
     this.getMe().pipe(take(1)).subscribe({
-      error: () => this.logout()
+      next: (user) => console.log('AuthService - Utilisateur chargé:', user),
+      error: (err) => {
+        console.error('AuthService - Erreur lors du chargement de l\'utilisateur:', err);
+        this.logout();
+      }
     });
   }
 

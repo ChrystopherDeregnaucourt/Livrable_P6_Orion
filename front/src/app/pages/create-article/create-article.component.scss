@@ -51,14 +51,15 @@
   flex-direction: column;
 }
 
+.form-field
 .form-select,
 .form-input,
 .form-textarea {
   width: 100%;
   padding: 12px 16px;
   font-size: 16px;
-  border: 1px solid #E0E0E0;
-  border-radius: 4px;
+  border: 2px solid #673AB7;
+  border-radius: 6px;
   background-color: #FAFAFA;
   color: #424242;
   font-family: inherit;
@@ -66,7 +67,6 @@
 
   &:focus {
     outline: none;
-    border-color: #673AB7;
     background-color: #FFFFFF;
   }
 

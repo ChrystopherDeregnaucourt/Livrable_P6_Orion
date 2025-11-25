@@ -4,17 +4,19 @@ export interface Article {
   id: number;
   title: string;
   content: string;
-  author: string;
-  date: string;
-  theme: string;
+  authorId: number;
+  authorName: string;
+  topicId: number;
+  topicTitle: string;
+  created_at: string;
 }
 
 export interface ArticleDetail extends Article {
-  comments: Comment[];
+  comments?: Comment[];
 }
 
 export interface CreateArticlePayload {
-  themeId: number;
+  topicId: number;
   title: string;
   content: string;
 }

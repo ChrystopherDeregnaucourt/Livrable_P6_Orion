@@ -1,114 +1,110 @@
 package com.openclassrooms.mddapi.controller;
 
-import java.security.Principal;
+import com.openclassrooms.mddapi.dto.CommentRequest;
+import com.openclassrooms.mddapi.dto.CommentResponse;
+import com.openclassrooms.mddapi.dto.MessageResponse;
+import com.openclassrooms.mddapi.dto.PostRequest;
+import com.openclassrooms.mddapi.dto.PostResponse;
+import com.openclassrooms.mddapi.security.CustomUserDetails;
+import com.openclassrooms.mddapi.service.CommentService;
+import com.openclassrooms.mddapi.service.PostService;
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import com.openclassrooms.mddapi.model.Comment;
-import com.openclassrooms.mddapi.model.Post;
-import com.openclassrooms.mddapi.model.User;
-import com.openclassrooms.mddapi.payload.request.CreateCommentDto;
-import com.openclassrooms.mddapi.payload.request.CreatePostDto;
-import com.openclassrooms.mddapi.payload.response.CommentDto;
-import com.openclassrooms.mddapi.payload.response.PostDetailDto;
-import com.openclassrooms.mddapi.payload.response.PostDto;
-import com.openclassrooms.mddapi.repository.UserRepository;
-import com.openclassrooms.mddapi.security.services.UserDetailsImpl;
-import com.openclassrooms.mddapi.service.ICommentService;
-import com.openclassrooms.mddapi.service.IPostService;
-
+/**
+ * Contrôleur pour la gestion des articles (posts)
+ */
 @RestController
-@RequestMapping("/api/articles")
-public class PostController {
+@RequestMapping("/api/posts")
+public class PostController
+{
+    private final PostService postService;
+    private final CommentService commentService;
 
-    @Autowired
-    private IPostService postService;
-    
-    @Autowired
-    private ICommentService commentService;
-    
-    @Autowired
-    private UserRepository userRepository;
-    
-    // Méthode utilitaire pour convertir Post -> PostDto
-    private PostDto convertToDto(Post post) {
-        PostDto dto = new PostDto();
-        dto.setId(post.getId());
-        dto.setTitle(post.getTitle());
-        dto.setContent(post.getContent());
-        dto.setDate(post.getCreatedAt());
-        dto.setAuthor(post.getAuthor().getUsername());
-        dto.setTheme(post.getTopic().getName());
-        return dto;
+    public PostController(PostService postService, CommentService commentService)
+    {
+        this.postService = postService;
+        this.commentService = commentService;
     }
 
-    // GET : Liste de tous les articles
-    @GetMapping
-    public List<PostDto> getArticles() {
-        return postService.findAll().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-    
-    // GET : Détail d'un article (avec commentaires)
-    @GetMapping("/{id}")
-    public ResponseEntity<PostDetailDto> getArticle(@PathVariable Long id) {
-        Post post = postService.findById(id);
-        if (post == null) {
-            return ResponseEntity.notFound().build();
-        }
-        
-        PostDetailDto dto = new PostDetailDto();
-        // Mapping manuel des champs
-        dto.setId(post.getId());
-        dto.setTitle(post.getTitle());
-        dto.setContent(post.getContent());
-        dto.setDate(post.getCreatedAt());
-        dto.setAuthor(post.getAuthor().getUsername());
-        dto.setTheme(post.getTopic().getName());
-        
-        // Récupération et mapping des commentaires
-        List<CommentDto> comments = commentService.findByPostId(id).stream()
-                .map(c -> new CommentDto(c.getId(), c.getAuthor().getUsername(), c.getContent()))
-                .collect(Collectors.toList());
-        dto.setComments(comments);
-        
-        return ResponseEntity.ok(dto);
-    }
-    
-    // POST : Créer un article
+    /**
+     * Crée un nouvel article
+     */
     @PostMapping
-    public ResponseEntity<?> createArticle(@Valid @RequestBody CreatePostDto createPostDto, Principal principal) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) ((Authentication) principal).getPrincipal();
-        User user = userRepository.findById(userDetails.getId()).orElse(null);
-        
-        Post post = postService.create(createPostDto.getTitle(), createPostDto.getContent(), createPostDto.getThemeId(), user);
-        if (post == null) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> createPost(
+            @Valid @RequestBody PostRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails)
+    {
+        try
+        {
+            PostResponse post = postService.createPost(request, userDetails.getId());
+            return ResponseEntity.ok(post);
         }
-        
-        return ResponseEntity.ok(convertToDto(post));
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
     }
-    
-    // POST : Ajouter un commentaire à un article
-    @PostMapping("/{id}/comments")
-    public ResponseEntity<?> addComment(@PathVariable Long id, @Valid @RequestBody CreateCommentDto commentDto, Principal principal) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) ((Authentication) principal).getPrincipal();
-        User user = userRepository.findById(userDetails.getId()).orElse(null);
-        Post post = postService.findById(id);
-        
-        if (post == null || user == null) {
-            return ResponseEntity.badRequest().build();
+
+    /**
+     * Récupère tous les articles
+     */
+    @GetMapping
+    public ResponseEntity<List<PostResponse>> getAllPosts()
+    {
+        List<PostResponse> posts = postService.getAllPosts();
+        return ResponseEntity.ok(posts);
+    }
+
+    /**
+     * Récupère un article par son ID
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPostById(@PathVariable Long id)
+    {
+        try
+        {
+            PostResponse post = postService.getPostById(id);
+            return ResponseEntity.ok(post);
         }
-        
-        Comment comment = commentService.create(commentDto.getContent(), post, user);
-        
-        return ResponseEntity.ok(new CommentDto(comment.getId(), comment.getAuthor().getUsername(), comment.getContent()));
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
+    }
+
+    /**
+     * Récupère les commentaires d'un article
+     */
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<CommentResponse>> getCommentsByPost(@PathVariable Long id)
+    {
+        List<CommentResponse> comments = commentService.getCommentsByPost(id);
+        return ResponseEntity.ok(comments);
+    }
+
+    /**
+     * Ajoute un commentaire à un article
+     */
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<?> addComment(
+            @PathVariable Long id,
+            @Valid @RequestBody CommentRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails)
+    {
+        try
+        {
+            // On force l'ID du post dans la requête
+            request.setPostId(id);
+            CommentResponse comment = commentService.createComment(request, userDetails.getId());
+            return ResponseEntity.ok(comment);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
     }
 }

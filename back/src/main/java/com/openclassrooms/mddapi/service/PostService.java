@@ -1,49 +1,120 @@
 package com.openclassrooms.mddapi.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
-import com.openclassrooms.mddapi.model.Post;
-import com.openclassrooms.mddapi.model.Topic;
-import com.openclassrooms.mddapi.model.User;
+import com.openclassrooms.mddapi.dto.PostRequest;
+import com.openclassrooms.mddapi.dto.PostResponse;
+import com.openclassrooms.mddapi.entity.Post;
+import com.openclassrooms.mddapi.entity.Topic;
+import com.openclassrooms.mddapi.entity.User;
 import com.openclassrooms.mddapi.repository.PostRepository;
-import com.openclassrooms.mddapi.repository.TopicRepository;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service pour la gestion des articles (posts)
+ */
 @Service
-public class PostService implements IPostService {
-    @Autowired
-    private PostRepository postRepository;
-    
-    @Autowired
-    private TopicRepository topicRepository;
+public class PostService
+{
+    private final PostRepository postRepository;
+    private final TopicService topicService;
+    private final UserService userService;
+    private final CommentService commentService;
 
-    @Override
-    public List<Post> findAll() {
-        // On trie par date de création décroissante (du plus récent au plus ancien)
-        return postRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+    public PostService(PostRepository postRepository, TopicService topicService, UserService userService, CommentService commentService)
+    {
+        this.postRepository = postRepository;
+        this.topicService = topicService;
+        this.userService = userService;
+        this.commentService = commentService;
     }
 
-    @Override
-    public Post findById(Long id) {
-        return postRepository.findById(id).orElse(null);
-    }
+    /**
+     * Crée un nouvel article
+     */
+    @Transactional
+    public PostResponse createPost(PostRequest request, Long authorId)
+    {
+        // Récupère l'auteur et le topic
+        User author = userService.findById(authorId)
+                .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable"));
+        Topic topic = topicService.findById(request.getTopicId());
 
-    @Override
-    public Post create(String title, String content, Long topicId, User author) {
-        Topic topic = topicRepository.findById(topicId).orElse(null);
-        if (topic == null) {
-            return null;
-        }
-
+        // Crée le post
         Post post = new Post();
-        post.setTitle(title);
-        post.setContent(content);
+        post.setTitle(request.getTitle());
+        post.setContent(request.getContent());
         post.setTopic(topic);
         post.setAuthor(author);
-        
-        return postRepository.save(post);
+
+        Post savedPost = postRepository.save(post);
+        return toResponse(savedPost);
+    }
+
+    /**
+     * Récupère tous les articles
+     */
+    public List<PostResponse> getAllPosts()
+    {
+        List<Post> posts = postRepository.findAll();
+        return posts.stream()
+                .map(this::toResponseWithoutComments)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Récupère les articles d'un topic spécifique
+     */
+    public List<PostResponse> getPostsByTopic(Long topicId)
+    {
+        List<Post> posts = postRepository.findByTopicId(topicId);
+        return posts.stream()
+                .map(this::toResponseWithoutComments)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Récupère un article par son ID
+     */
+    public PostResponse getPostById(Long id)
+    {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Article introuvable avec l'ID : " + id));
+        return toResponse(post);
+    }
+
+    /**
+     * Convertit une entité Post en PostResponse avec commentaires
+     */
+    public PostResponse toResponse(Post post)
+    {
+        PostResponse response = toResponseWithoutComments(post);
+        // Ajoute les commentaires associés au post
+        response.setComments(commentService.getCommentsByPost(post.getId()));
+        return response;
+    }
+
+    /**
+     * Convertit une entité Post en PostResponse sans commentaires (pour les listes)
+     */
+    private PostResponse toResponseWithoutComments(Post post)
+    {
+        PostResponse response = new PostResponse();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                .withZone(ZoneId.systemDefault());
+
+        response.setId(post.getId());
+        response.setTitle(post.getTitle());
+        response.setContent(post.getContent());
+        response.setTopicId(post.getTopic().getId());
+        response.setTopicTitle(post.getTopic().getTitle());
+        response.setAuthorId(post.getAuthor().getId());
+        response.setAuthorName(post.getAuthor().getUsername());
+        response.setCreatedAt(formatter.format(post.getCreatedAt()));
+
+        return response;
     }
 }
