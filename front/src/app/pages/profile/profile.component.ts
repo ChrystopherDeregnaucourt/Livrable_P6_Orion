@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
+import { passwordValidator } from '../../validators/password.validator';
 
 interface SubscriptionItem {
   id: number;
@@ -35,7 +36,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.profileForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['']  // Optionnel, sera validé seulement si rempli
+      password: ['', [Validators.minLength(8), passwordValidator()]]  // Optionnel, sera validé seulement si rempli
     });
 
     // Charger les données utilisateur depuis l'API
@@ -63,6 +64,30 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // Vérifie si le mot de passe contient au moins un chiffre
+  hasNumber(): boolean {
+    const password = this.profileForm.get('password')?.value;
+    return password ? /[0-9]/.test(password) : true;
+  }
+
+  // Vérifie si le mot de passe contient au moins une minuscule
+  hasLowerCase(): boolean {
+    const password = this.profileForm.get('password')?.value;
+    return password ? /[a-z]/.test(password) : true;
+  }
+
+  // Vérifie si le mot de passe contient au moins une majuscule
+  hasUpperCase(): boolean {
+    const password = this.profileForm.get('password')?.value;
+    return password ? /[A-Z]/.test(password) : true;
+  }
+
+  // Vérifie si le mot de passe contient au moins un caractère spécial
+  hasSpecialChar(): boolean {
+    const password = this.profileForm.get('password')?.value;
+    return password ? /[@#$%^&+=!*()_\-{}\[\]:;"'<>,.?/~`|]/.test(password) : true;
   }
 
   toggleMobileMenu(): void {

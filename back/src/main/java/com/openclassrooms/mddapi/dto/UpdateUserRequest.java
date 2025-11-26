@@ -1,6 +1,7 @@
 package com.openclassrooms.mddapi.dto;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -14,7 +15,11 @@ public class UpdateUserRequest
     @Email(message = "L'email doit être valide")
     private String email;
 
-    @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
+    @Size(min = 8, max = 40, message = "Le mot de passe doit contenir au moins 8 caractères")
+    @Pattern(
+        regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!*()_\\-{}\\[\\]:;\"'<>,.?/~`|]).{8,}$",
+        message = "Le mot de passe doit contenir au moins un chiffre, une minuscule, une majuscule et un caractère spécial"
+    )
     private String password;
 
     public String getUsername()

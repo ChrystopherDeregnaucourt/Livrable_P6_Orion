@@ -5,6 +5,7 @@ import { Location } from '@angular/common';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
+import { passwordValidator } from '../../validators/password.validator';
 
 @Component({
   selector: 'app-login',
@@ -35,7 +36,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   private initForm(): void {
     this.loginForm = this.formBuilder.group({
       emailOrUsername: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(8), passwordValidator()]]
     });
   }
 

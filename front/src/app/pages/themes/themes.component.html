@@ -55,7 +55,8 @@
   <!-- Content Area -->
   <main class="nav-page-content">
     <div class="content-grid">
-      <div class="base-card theme-card" *ngFor="let theme of themes; trackBy: trackByThemeId">
+      @for (theme of themes; track trackByThemeId($index, theme)) {
+      <div class="base-card theme-card">
         <div class="card-content-area">
           <h3 class="card-title">{{ theme.title }}</h3>
           <p class="card-description">{{ theme.description }}</p>
@@ -68,6 +69,7 @@
           {{ theme.subscribed ? 'Déjà abonné' : 'S\'abonner' }}
         </button>
       </div>
+      }
     </div>
   </main>
 </div>

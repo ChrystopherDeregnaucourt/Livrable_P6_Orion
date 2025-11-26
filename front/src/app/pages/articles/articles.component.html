@@ -74,8 +74,8 @@
 
     <!-- Articles Grid -->
     <div class="content-grid">
-      <div class="base-card article-card" 
-           *ngFor="let article of articles; trackBy: trackByArticleId"
+      @for (article of articles; track trackByArticleId($index, article)) {
+      <div class="base-card article-card"
            (click)="onArticleClick(article.id)"
            style="cursor: pointer;">
         <div class="card-header">
@@ -89,6 +89,7 @@
           <p>{{ article.content }}</p>
         </div>
       </div>
+      }
     </div>
   </main>
 </div>

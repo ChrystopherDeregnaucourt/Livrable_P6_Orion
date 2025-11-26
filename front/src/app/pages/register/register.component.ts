@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
+import { passwordValidator } from '../../validators/password.validator';
 
 @Component({
   selector: 'app-register',
@@ -25,13 +26,37 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.registerForm = this.fb.group({
       username: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(8), passwordValidator()]],
     });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // Vérifie si le mot de passe contient au moins un chiffre
+  hasNumber(): boolean {
+    const password = this.registerForm.get('password')?.value;
+    return password ? /[0-9]/.test(password) : true;
+  }
+
+  // Vérifie si le mot de passe contient au moins une minuscule
+  hasLowerCase(): boolean {
+    const password = this.registerForm.get('password')?.value;
+    return password ? /[a-z]/.test(password) : true;
+  }
+
+  // Vérifie si le mot de passe contient au moins une majuscule
+  hasUpperCase(): boolean {
+    const password = this.registerForm.get('password')?.value;
+    return password ? /[A-Z]/.test(password) : true;
+  }
+
+  // Vérifie si le mot de passe contient au moins un caractère spécial
+  hasSpecialChar(): boolean {
+    const password = this.registerForm.get('password')?.value;
+    return password ? /[@#$%^&+=!*()_\-{}\[\]:;"'<>,.?/~`|]/.test(password) : true;
   }
 
   onSubmit(): void {

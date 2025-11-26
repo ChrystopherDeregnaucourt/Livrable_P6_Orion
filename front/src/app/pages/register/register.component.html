@@ -46,6 +46,29 @@
             formControlName="password"
             class="form-page-input"
           />
+          @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+            <div class="password-error-message">
+              <p class="error-title">Le mot de passe ne respecte pas les critères de sécurité :</p>
+              <ul class="error-list">
+                @if (registerForm.get('password')?.hasError('minlength')) {
+                  <li>X Doit contenir au moins 8 caractères</li>
+                }
+                @if (registerForm.get('password')?.hasError('passwordStrength') && !hasNumber()) {
+                  <li>X Doit contenir au moins 1 chiffre</li>
+                }
+                @if (registerForm.get('password')?.hasError('passwordStrength') && !hasLowerCase()) {
+                  <li>X Doit contenir au moins 1 lettre minuscule</li>
+                }
+                @if (registerForm.get('password')?.hasError('passwordStrength') && !hasUpperCase()) {
+                  <li>X Doit contenir au moins 1 lettre majuscule</li>
+                }
+                @if (registerForm.get('password')?.hasError('passwordStrength') && !hasSpecialChar()) {
+                  <li>X Doit contenir au moins 1 caractère spécial</li>
+                }
+              </ul>
+              <p class="button-disabled-info">Le bouton S inscrire n est pas disponible car le mot de passe ne respecte pas les instructions de complexité.</p>
+            </div>
+          }
         </div>
 
         <button
@@ -53,8 +76,7 @@
           color="primary"
           type="submit"
           class="form-page-submit-button"
-          [disabled]="!registerForm.valid"
-        >
+          [disabled]="!registerForm.valid">
           S'inscrire
         </button>
       </form>

@@ -98,6 +98,53 @@
   &:hover {
     border-color: #999999;
   }
+
+  &.ng-invalid.ng-touched {
+    border-color: #dc2626;
+  }
+}
+
+.password-error-message {
+  width: 60%;
+  margin: 8px auto 0;
+  padding: 12px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #991b1b;
+
+  .error-title {
+    margin: 0 0 8px 0;
+    font-weight: 500;
+    color: #dc2626;
+  }
+
+  .error-list {
+    margin: 0 0 10px 0;
+    padding-left: 20px;
+    list-style: none;
+
+    li {
+      margin: 4px 0;
+      color: #dc2626;
+      font-size: 12px;
+
+      &::before {
+        content: '';
+        margin-right: 6px;
+      }
+    }
+  }
+
+  .button-disabled-info {
+    margin: 10px 0 0 0;
+    padding-top: 10px;
+    border-top: 1px solid #fecaca;
+    font-weight: 500;
+    font-size: 13px;
+    color: #991b1b;
+  }
 }
 
 .form-page-submit-button {

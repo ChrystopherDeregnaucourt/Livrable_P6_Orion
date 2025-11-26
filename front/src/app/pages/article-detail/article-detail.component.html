@@ -53,46 +53,48 @@
   </header>
 
   <!-- Content Area -->
-  <main class="nav-page-content" *ngIf="article">
+  @if (article) {
+  <main class="nav-page-content">
     <div class="article-detail-container">
       <!-- Back Button & Title on same line -->
       <div class="article-detail-header">
         <button mat-icon-button class="back-btn" (click)="onGoBack()">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <h1 class="article-detail-title">{{ article.title }}</h1>
+        <h1 class="article-detail-title" [textContent]="article.title"></h1>
       </div>
 
       <!-- Date, Author, Theme -->
       <div class="article-detail-meta">
-        <span class="article-detail-date">{{ article.created_at | date:'dd/MM/yyyy' }}</span>
-        <span class="article-detail-author">{{ article.authorName }}</span>
-        <span class="article-detail-theme">{{ article.topicTitle }}</span>
+        <span class="article-detail-date" [textContent]="article.created_at | date:'dd/MM/yyyy'"></span>
+        <span class="article-detail-author" [textContent]="article.authorName"></span>
+        <span class="article-detail-theme" [textContent]="article.topicTitle"></span>
       </div>
 
       <!-- Article Content -->
       <div class="article-detail-content">
-        <p>{{ article.content }}</p>
+        <p [textContent]="article.content"></p>
       </div>
 
       <!-- Comments Section -->
       <div class="comments-section">
         <h2 class="comments-title">Commentaires</h2>
         
-        <div class="comment-item" *ngFor="let comment of comments; trackBy: trackByCommentId">
+        @for (comment of comments; track trackByCommentId($index, comment)) 
+        {
+        <div class="comment-item">
           <div class="comment-header">
-            <span class="comment-username">{{ comment.authorName }}</span>
+            <span class="comment-username" [textContent]="comment.authorName"></span>
           </div>
-          <div class="comment-content">
-            {{ comment.content }}
-          </div>
+          <div class="comment-content" [textContent]="comment.content"></div>
         </div>
+        }
 
         <!-- Comment Form -->
         <form class="comment-form" (ngSubmit)="onSubmitComment()">
           <textarea 
             class="comment-input" 
-            placeholder="Écrivez ici votre commentaire"
+            [placeholder]="'Écrivez ici votre commentaire'"
             [(ngModel)]="newComment"
             name="comment"
             rows="4"
@@ -105,4 +107,5 @@
       </div>
     </div>
   </main>
+  }
 </div>
