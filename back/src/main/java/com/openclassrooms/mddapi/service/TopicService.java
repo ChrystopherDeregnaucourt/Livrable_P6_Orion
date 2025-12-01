@@ -13,7 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service pour la gestion des topics (thèmes)
+ * Service de gestion des topics (thèmes).
+ * <p>
+ * Gère la création, la recherche et la conversion des topics.
+ * Permet également de déterminer si un utilisateur est abonné à un topic.
+ * </p>
+ *
  */
 @Service
 public class TopicService
@@ -21,6 +26,12 @@ public class TopicService
     private final TopicRepository topicRepository;
     private final UserService userService;
 
+    /**
+     * Constructeur avec injection des dépendances.
+     *
+     * @param topicRepository le repository pour accéder aux données des topics
+     * @param userService     le service utilisateur pour vérifier les abonnements
+     */
     public TopicService(TopicRepository topicRepository, UserService userService)
     {
         this.topicRepository = topicRepository;
@@ -28,7 +39,14 @@ public class TopicService
     }
 
     /**
-     * Récupère tous les topics avec le statut d'abonnement pour un utilisateur
+     * Récupère tous les topics avec l'indicateur d'abonnement pour un utilisateur.
+     * <p>
+     * Si userId est fourni, le champ 'subscribed' indique si l'utilisateur est abonné.
+     * Si userId est null, le champ 'subscribed' reste null.
+     * </p>
+     *
+     * @param userId l'identifiant de l'utilisateur connecté (peut être null)
+     * @return la liste de tous les topics avec leur statut d'abonnement
      */
     public List<TopicResponse> getAllTopics(Long userId)
     {
@@ -47,7 +65,11 @@ public class TopicService
     }
 
     /**
-     * Récupère un topic par son ID
+     * Recherche un topic par son identifiant.
+     *
+     * @param id l'identifiant du topic
+     * @return l'entité Topic
+     * @throws IllegalArgumentException si le topic n'existe pas
      */
     public Topic findById(Long id)
     {
@@ -56,7 +78,10 @@ public class TopicService
     }
 
     /**
-     * Crée un nouveau topic
+     * Crée un nouveau topic.
+     *
+     * @param request les données du topic à créer (titre, description)
+     * @return le DTO du topic créé
      */
     @Transactional
     public TopicResponse createTopic(TopicRequest request)
@@ -74,7 +99,10 @@ public class TopicService
     }
 
     /**
-     * Convertit une entité Topic en TopicResponse
+     * Convertit une entité Topic en TopicResponse (sans indicateur d'abonnement).
+     *
+     * @param topic l'entité topic à convertir
+     * @return le DTO de réponse
      */
     public TopicResponse toResponse(Topic topic)
     {
@@ -82,7 +110,14 @@ public class TopicService
     }
     
     /**
-     * Convertit une entité Topic en TopicResponse avec le statut d'abonnement
+     * Convertit une entité Topic en TopicResponse avec le statut d'abonnement.
+     * <p>
+     * Si un utilisateur est fourni, détermine s'il est abonné au topic.
+     * </p>
+     *
+     * @param topic l'entité topic à convertir
+     * @param user  l'utilisateur pour lequel vérifier l'abonnement (peut être null)
+     * @return le DTO de réponse avec l'indicateur d'abonnement
      */
     public TopicResponse toResponse(Topic topic, User user)
     {

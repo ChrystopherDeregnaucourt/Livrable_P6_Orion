@@ -21,7 +21,17 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Entité représentant un utilisateur
+ * Entité JPA représentant un utilisateur de l'application.
+ * <p>
+ * Cette classe gère les informations de base de l'utilisateur ainsi que
+ * ses abonnements aux topics (thèmes). Elle utilise une relation ManyToMany
+ * pour gérer les abonnements via la table de jointure "subscriptions".
+ * </p>
+ * <p>
+ * Les contraintes d'unicité sont appliquées sur l'email et le username
+ * pour éviter les doublons.
+ * </p>
+ *
  */
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -33,27 +43,53 @@ import java.util.List;
 @AllArgsConstructor
 public class User
 {
+    /**
+     * Identifiant unique de l'utilisateur (clé primaire auto-générée).
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Adresse email de l'utilisateur (unique et obligatoire).
+     * Utilisée comme identifiant de connexion.
+     */
     @Column(nullable = false, unique = true)
     private String email;
 
+    /**
+     * Nom d'utilisateur (unique et obligatoire).
+     * Affiché publiquement dans l'application.
+     */
     @Column(nullable = false, unique = true)
     private String username;
 
+    /**
+     * Mot de passe hashé avec BCrypt (obligatoire).
+     * Ne doit jamais être stocké en clair.
+     */
     @Column(nullable = false)
     private String password;
 
+    /**
+     * Date et heure de création du compte utilisateur.
+     * Initialisée automatiquement à la création.
+     */
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
+    /**
+     * Date et heure de la dernière mise à jour du profil utilisateur.
+     * Mise à jour automatiquement via la méthode {@link #onUpdate()}.
+     */
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();
 
-    // Relation ManyToMany pour les abonnements aux topics
-    // Un utilisateur peut suivre plusieurs topics
+    /**
+     * Liste des topics (thèmes) auxquels l'utilisateur est abonné.
+     * Relation ManyToMany avec chargement lazy pour optimiser les performances.
+     * Un utilisateur peut suivre plusieurs topics, et un topic peut avoir plusieurs abonnés.
+     */
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "subscriptions",
@@ -64,7 +100,14 @@ public class User
     @EqualsAndHashCode.Exclude
     private List<Topic> subscriptions;
 
-    // Constructeur pour initialiser les propriétés principales (sans id, createdAt et updatedAt)
+    /**
+     * Constructeur pour créer un nouvel utilisateur avec les informations essentielles.
+     * Les horodatages (createdAt, updatedAt) sont initialisés automatiquement.
+     *
+     * @param email    l'adresse email de l'utilisateur (doit être unique)
+     * @param username le nom d'utilisateur (doit être unique)
+     * @param password le mot de passe hashé avec BCrypt
+     */
     public User(String email, String username, String password)
     {
         this.email = email;
@@ -74,7 +117,10 @@ public class User
         this.updatedAt = Instant.now();
     }
 
-    // Méthode appelée automatiquement avant chaque mise à jour
+    /**
+     * Méthode de callback JPA appelée automatiquement avant chaque mise à jour en base.
+     * Met à jour le champ {@code updatedAt} avec la date/heure actuelle.
+     */
     @PreUpdate
     protected void onUpdate()
     {

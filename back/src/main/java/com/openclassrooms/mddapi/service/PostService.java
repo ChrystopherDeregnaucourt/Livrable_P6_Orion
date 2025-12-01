@@ -14,7 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service pour la gestion des articles (posts)
+ * Service de gestion des posts (articles).
+ * <p>
+ * Gère la création, la recherche et la conversion des posts.
+ * Coordonne avec TopicService, UserService et CommentService pour
+ * obtenir les données complètes des posts.
+ * </p>
+ *
  */
 @Service
 public class PostService
@@ -24,6 +30,14 @@ public class PostService
     private final UserService userService;
     private final CommentService commentService;
 
+    /**
+     * Constructeur avec injection des dépendances.
+     *
+     * @param postRepository  le repository pour accéder aux données des posts
+     * @param topicService    le service pour gérer les topics
+     * @param userService     le service pour gérer les utilisateurs
+     * @param commentService  le service pour gérer les commentaires
+     */
     public PostService(PostRepository postRepository, TopicService topicService, UserService userService, CommentService commentService)
     {
         this.postRepository = postRepository;
@@ -33,7 +47,12 @@ public class PostService
     }
 
     /**
-     * Crée un nouvel article
+     * Crée un nouvel article.
+     *
+     * @param request  les données du post à créer (titre, contenu, topicId)
+     * @param authorId l'identifiant de l'auteur du post
+     * @return le DTO du post créé
+     * @throws IllegalArgumentException si l'utilisateur ou le topic n'existe pas
      */
     @Transactional
     public PostResponse createPost(PostRequest request, Long authorId)
@@ -55,7 +74,9 @@ public class PostService
     }
 
     /**
-     * Récupère tous les articles
+     * Récupère tous les articles (sans les commentaires).
+     *
+     * @return la liste de tous les posts
      */
     public List<PostResponse> getAllPosts()
     {
@@ -66,7 +87,10 @@ public class PostService
     }
 
     /**
-     * Récupère les articles d'un topic spécifique
+     * Récupère tous les articles d'un topic spécifique (sans les commentaires).
+     *
+     * @param topicId l'identifiant du topic
+     * @return la liste des posts du topic
      */
     public List<PostResponse> getPostsByTopic(Long topicId)
     {
@@ -77,7 +101,11 @@ public class PostService
     }
 
     /**
-     * Récupère un article par son ID
+     * Récupère un article par son identifiant (avec les commentaires).
+     *
+     * @param id l'identifiant du post
+     * @return le DTO du post avec ses commentaires
+     * @throws IllegalArgumentException si le post n'existe pas
      */
     public PostResponse getPostById(Long id)
     {
@@ -87,7 +115,10 @@ public class PostService
     }
 
     /**
-     * Convertit une entité Post en PostResponse avec commentaires
+     * Convertit une entité Post en PostResponse avec les commentaires.
+     *
+     * @param post l'entité post à convertir
+     * @return le DTO de réponse avec les commentaires
      */
     public PostResponse toResponse(Post post)
     {
@@ -98,7 +129,13 @@ public class PostService
     }
 
     /**
-     * Convertit une entité Post en PostResponse sans commentaires (pour les listes)
+     * Convertit une entité Post en PostResponse sans les commentaires.
+     * <p>
+     * Utilisée pour les listes de posts afin d'optimiser les performances.
+     * </p>
+     *
+     * @param post l'entité post à convertir
+     * @return le DTO de réponse sans commentaires
      */
     private PostResponse toResponseWithoutComments(Post post)
     {

@@ -6,14 +6,29 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository pour l'accès aux données des posts
+ * Repository Spring Data JPA pour l'accès aux données de l'entité {@link Post}.
+ * <p>
+ * Fournit les opérations CRUD standards ainsi que des méthodes de recherche
+ * personnalisées pour filtrer les posts par topic ou auteur.
+ * </p>
+ *
  */
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long>
 {
-    // Méthode pour trouver tous les posts d'un topic spécifique
+    /**
+     * Récupère tous les posts associés à un topic spécifique.
+     *
+     * @param topicId l'identifiant du topic
+     * @return la liste des posts du topic
+     */
     List<Post> findByTopicId(Long topicId);
     
-    // Méthode pour trouver tous les posts d'un auteur spécifique
+    /**
+     * Récupère tous les posts créés par un utilisateur spécifique.
+     *
+     * @param authorId l'identifiant de l'auteur
+     * @return la liste des posts de l'auteur
+     */
     List<Post> findByAuthorId(Long authorId);
 }

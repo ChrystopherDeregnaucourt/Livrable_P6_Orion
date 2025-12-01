@@ -3,16 +3,42 @@ package com.openclassrooms.mddapi.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * DTO pour la réponse d'un commentaire
+ * DTO de réponse contenant les informations d'un commentaire.
+ * <p>
+ * Inclut les détails de l'auteur et du post associé.
+ * </p>
+ *
  */
 public class CommentResponse
 {
+    /**
+     * Identifiant unique du commentaire.
+     */
     private Long id;
+    
+    /**
+     * Identifiant du post sur lequel le commentaire a été posté.
+     */
     private Long postId;
+    
+    /**
+     * Identifiant de l'auteur du commentaire.
+     */
     private Long authorId;
+    
+    /**
+     * Nom d'utilisateur de l'auteur du commentaire.
+     */
     private String authorName;
+    
+    /**
+     * Contenu textuel du commentaire.
+     */
     private String content;
     
+    /**
+     * Date de création du commentaire au format "yyyy/MM/dd".
+     */
     @JsonProperty("created_at")
     private String createdAt;
 

@@ -3,20 +3,45 @@ package com.openclassrooms.mddapi.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * DTO pour la réponse d'un topic
+ * DTO de réponse contenant les informations d'un topic (thème).
+ * <p>
+ * Inclut un indicateur {@code subscribed} permettant de savoir si
+ * l'utilisateur connecté est abonné à ce topic (optionnel selon le contexte).
+ * </p>
+ *
  */
 public class TopicResponse
 {
+    /**
+     * Identifiant unique du topic.
+     */
     private Long id;
+    
+    /**
+     * Titre du topic.
+     */
     private String title;
+    
+    /**
+     * Description du topic.
+     */
     private String description;
     
-    // Indique si l'utilisateur est abonné à ce topic (optionnel)
+    /**
+     * Indique si l'utilisateur connecté est abonné à ce topic.
+     * Null si aucun utilisateur n'est authentifié.
+     */
     private Boolean subscribed;
     
+    /**
+     * Date de création du topic au format "yyyy/MM/dd".
+     */
     @JsonProperty("created_at")
     private String createdAt;
     
+    /**
+     * Date de dernière modification du topic au format "yyyy/MM/dd".
+     */
     @JsonProperty("updated_at")
     private String updatedAt;
 

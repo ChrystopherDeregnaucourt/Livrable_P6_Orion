@@ -17,7 +17,20 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Contrôleur pour la gestion des utilisateurs (notamment les abonnements aux topics)
+ * Contrôleur REST pour la gestion du profil utilisateur et des abonnements.
+ * <p>
+ * Expose les endpoints pour modifier le profil de l'utilisateur connecté,
+ * s'abonner et se désabonner des topics.
+ * </p>
+ * <p>
+ * Endpoints :
+ * </p>
+ * <ul>
+ *   <li>PUT /api/users/me - Mise à jour du profil</li>
+ *   <li>POST /api/users/me/subscriptions/{topicId} - Abonnement à un topic</li>
+ *   <li>DELETE /api/users/me/subscriptions/{topicId} - Désabonnement d'un topic</li>
+ * </ul>
+ *
  */
 @RestController
 @RequestMapping("/api/users")
@@ -28,6 +41,14 @@ public class UserController
     private final TopicService topicService;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Constructeur avec injection des dépendances.
+     *
+     * @param userService     le service de gestion des utilisateurs
+     * @param userRepository  le repository des utilisateurs
+     * @param topicService    le service de gestion des topics
+     * @param passwordEncoder l'encodeur de mots de passe
+     */
     public UserController(UserService userService, UserRepository userRepository, TopicService topicService, PasswordEncoder passwordEncoder)
     {
         this.userService = userService;
@@ -37,7 +58,16 @@ public class UserController
     }
 
     /**
-     * Met à jour les informations de l'utilisateur connecté
+     * Met à jour les informations du profil de l'utilisateur connecté.
+     * <p>
+     * Tous les champs sont optionnels - seuls les champs fournis seront modifiés.
+     * Vérifie l'unicité de l'email et du username si modifiés.
+     * Hash le nouveau mot de passe si fourni.
+     * </p>
+     *
+     * @param request     les nouvelles données du profil (username, email, password optionnels)
+     * @param userDetails les détails de l'utilisateur connecté
+     * @return 200 OK avec les informations mises à jour, 400 Bad Request en cas d'erreur
      */
     @PutMapping("/me")
     @Transactional
@@ -100,7 +130,14 @@ public class UserController
     }
 
     /**
-     * S'abonne à un topic
+     * Abonne l'utilisateur connecté à un topic.
+     * <p>
+     * Vérifie que l'utilisateur n'est pas déjà abonné avant d'ajouter l'abonnement.
+     * </p>
+     *
+     * @param topicId     l'identifiant du topic auquel s'abonner
+     * @param userDetails les détails de l'utilisateur connecté
+     * @return 200 OK avec message de confirmation, 400 Bad Request si déjà abonné ou topic introuvable
      */
     @PostMapping("/me/subscriptions/{topicId}")
     @Transactional
@@ -135,7 +172,14 @@ public class UserController
     }
 
     /**
-     * Se désabonne d'un topic
+     * Désabonne l'utilisateur connecté d'un topic.
+     * <p>
+     * Vérifie que l'utilisateur est bien abonné avant de retirer l'abonnement.
+     * </p>
+     *
+     * @param topicId     l'identifiant du topic duquel se désabonner
+     * @param userDetails les détails de l'utilisateur connecté
+     * @return 200 OK avec message de confirmation, 400 Bad Request si non abonné ou topic introuvable
      */
     @DeleteMapping("/me/subscriptions/{topicId}")
     @Transactional

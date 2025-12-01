@@ -150,6 +150,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
           // Retirer l'abonnement de la liste locale
           this.subscriptions = this.subscriptions.filter((subscription) => subscription.id !== subscriptionId);
           console.log('Désabonnement réussi');
+          // Recharger l'utilisateur pour mettre à jour ses abonnements
+          this.authService.getMe().pipe(takeUntil(this.destroy$)).subscribe();
         },
         error: (error) => {
           console.error('Erreur lors du désabonnement:', error);

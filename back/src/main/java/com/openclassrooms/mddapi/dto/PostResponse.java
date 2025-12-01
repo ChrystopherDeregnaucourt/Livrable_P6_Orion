@@ -4,31 +4,60 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * DTO pour la réponse d'un post
+ * DTO de réponse contenant les informations d'un post (article).
+ * <p>
+ * Contient les détails du post ainsi que les informations du topic et de l'auteur associés.
+ * La liste des commentaires est incluse lors de la récupération d'un post spécifique.
+ * </p>
+ *
  */
 public class PostResponse
 {
+    /**
+     * Identifiant unique du post.
+     */
     private Long id;
+    
+    /**
+     * Titre du post.
+     */
     private String title;
+    
+    /**
+     * Contenu textuel du post.
+     */
     private String content;
     
-    // ID du topic
+    /**
+     * Identifiant du topic associé.
+     */
     private Long topicId;
     
-    // Titre du topic
+    /**
+     * Titre du topic associé.
+     */
     private String topicTitle;
     
-    // ID de l'auteur du post
+    /**
+     * Identifiant de l'auteur du post.
+     */
     private Long authorId;
     
-    // Nom de l'auteur du post
+    /**
+     * Nom d'utilisateur de l'auteur du post.
+     */
     private String authorName;
     
-    // Date de création formatée
+    /**
+     * Date de création du post au format "yyyy/MM/dd".
+     */
     @JsonProperty("created_at")
     private String createdAt;
     
-    // Liste des commentaires
+    /**
+     * Liste des commentaires associés au post.
+     * Null dans les listes, remplie lors de la récupération d'un post spécifique.
+     */
     private List<CommentResponse> comments;
 
     public Long getId()

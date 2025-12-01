@@ -19,7 +19,21 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Contrôleur pour l'authentification (inscription, connexion, infos utilisateur)
+ * Contrôleur REST pour l'authentification des utilisateurs.
+ * <p>
+ * Expose les endpoints publics pour l'inscription, la connexion,
+ * et un endpoint protégé pour récupérer les informations de
+ * l'utilisateur connecté.
+ * </p>
+ * <p>
+ * Endpoints :
+ * </p>
+ * <ul>
+ *   <li>POST /api/auth/register - Inscription d'un nouvel utilisateur</li>
+ *   <li>POST /api/auth/login - Connexion d'un utilisateur existant</li>
+ *   <li>GET /api/auth/me - Récupération du profil de l'utilisateur connecté</li>
+ * </ul>
+ *
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -30,6 +44,14 @@ public class AuthController
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
 
+    /**
+     * Constructeur avec injection des dépendances.
+     *
+     * @param userService           le service de gestion des utilisateurs
+     * @param jwtService            le service de gestion des JWT
+     * @param authenticationManager le gestionnaire d'authentification Spring Security
+     * @param userRepository        le repository des utilisateurs
+     */
     public AuthController(UserService userService, JwtService jwtService, AuthenticationManager authenticationManager, UserRepository userRepository)
     {
         this.userService = userService;
@@ -39,7 +61,14 @@ public class AuthController
     }
 
     /**
-     * Endpoint pour l'inscription d'un nouvel utilisateur
+     * Inscrit un nouvel utilisateur dans l'application.
+     * <p>
+     * Vérifie l'unicité de l'email et du username, hash le mot de passe,
+     * crée l'utilisateur et génère un token JWT.
+     * </p>
+     *
+     * @param request les données d'inscription (email, username, mot de passe)
+     * @return 200 OK avec le token JWT si succès, 400 Bad Request sinon
      */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request)
@@ -63,7 +92,14 @@ public class AuthController
     }
 
     /**
-     * Endpoint pour la connexion
+     * Connecte un utilisateur existant.
+     * <p>
+     * Accepte email ou username comme identifiant de connexion.
+     * Vérifie les credentials et génère un token JWT en cas de succès.
+     * </p>
+     *
+     * @param request les identifiants de connexion (email/username et mot de passe)
+     * @return 200 OK avec le token JWT si succès, 401 Unauthorized sinon
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request)
@@ -91,7 +127,15 @@ public class AuthController
     }
 
     /**
-     * Endpoint pour récupérer les informations de l'utilisateur connecté
+     * Récupère les informations de l'utilisateur actuellement connecté.
+     * <p>
+     * Inclut la liste des topics auxquels l'utilisateur est abonné.
+     * Nécessite une authentification JWT valide.
+     * </p>
+     *
+     * @param userDetails les détails de l'utilisateur connecté (injecté par Spring Security)
+     * @return 200 OK avec les informations utilisateur
+     * @throws IllegalArgumentException si l'utilisateur n'existe pas en base
      */
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails)

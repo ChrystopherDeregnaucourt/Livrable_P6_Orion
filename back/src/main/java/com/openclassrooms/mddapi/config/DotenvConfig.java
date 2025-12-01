@@ -10,12 +10,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Configuration pour charger les variables d'environnement depuis le fichier .env
- * Les variables sont chargées AVANT le démarrage de Spring Boot via EnvironmentPostProcessor
- * Cela permet à Spring d'utiliser ces variables dès le début (datasource, etc.)
+ * Configuration pour charger les variables d'environnement depuis un fichier .env.
+ * <p>
+ * Implémente {@link EnvironmentPostProcessor} pour charger le fichier .env
+ * AVANT le démarrage de Spring Boot, permettant ainsi à Spring d'utiliser
+ * ces variables dès l'initialisation (datasource, JWT secret, etc.).
+ * </p>
+ * <p>
+ * Le fichier .env doit être placé à la racine du projet.
+ * Si le fichier n'existe pas, aucune erreur n'est levée (mode ignoreIfMissing).
+ * </p>
+ * <p>
+ * Configuration requise dans META-INF/spring.factories pour activer ce processor.
+ * </p>
+ *
  */
 public class DotenvConfig implements EnvironmentPostProcessor {
 
+    /**
+     * Charge le fichier .env et injecte les variables dans l'environnement Spring.
+     * <p>
+     * Méthode appelée automatiquement par Spring Boot avant le démarrage de l'application.
+     * </p>
+     *
+     * @param environment l'environnement Spring configurable
+     * @param application l'application Spring Boot
+     */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         try {

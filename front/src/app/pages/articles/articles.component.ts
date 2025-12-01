@@ -16,6 +16,7 @@ export class ArticlesComponent implements OnInit, OnDestroy {
   isMobileMenuOpen = false;
   articles: Article[] = [];
   sortBy: 'date' | 'title' | 'author' = 'date';
+  sortOrder: 'asc' | 'desc' = 'desc'; // 'asc' pour ascendant, 'desc' pour descendant
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -114,20 +115,39 @@ export class ArticlesComponent implements OnInit, OnDestroy {
   }
 
   onSort(sortType: 'date' | 'title' | 'author'): void {
-    this.sortBy = sortType;
+    // Si on clique sur le même critère, inverser l'ordre
+    if (this.sortBy === sortType) {
+      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+      // Nouveau critère : réinitialiser l'ordre selon le type
+      this.sortBy = sortType;
+      // Pour les dates, descendant par défaut (plus récent en premier)
+      // Pour titre et auteur, ascendant par défaut (A-Z)
+      this.sortOrder = sortType === 'date' ? 'desc' : 'asc';
+    }
     this.sortArticles();
   }
 
   private sortArticles(): void {
     switch (this.sortBy) {
       case 'date':
-        this.articles.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        this.articles.sort((a, b) => {
+          const dateA = new Date(a.created_at).getTime();
+          const dateB = new Date(b.created_at).getTime();
+          return this.sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+        });
         break;
       case 'title':
-        this.articles.sort((a, b) => a.title.localeCompare(b.title));
+        this.articles.sort((a, b) => {
+          const comparison = a.title.localeCompare(b.title);
+          return this.sortOrder === 'asc' ? comparison : -comparison;
+        });
         break;
       case 'author':
-        this.articles.sort((a, b) => a.authorName.localeCompare(b.authorName));
+        this.articles.sort((a, b) => {
+          const comparison = a.authorName.localeCompare(b.authorName);
+          return this.sortOrder === 'asc' ? comparison : -comparison;
+        });
         break;
     }
   }

@@ -16,23 +16,48 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service pour la gestion des utilisateurs
+ * Service de gestion des utilisateurs.
+ * <p>
+ * Ce service gère la création des comptes utilisateur, la conversion
+ * vers les DTOs de réponse, et la recherche d'utilisateurs.
+ * Il applique les règles métier comme la vérification d'unicité
+ * des emails et usernames, et le chiffrement sécurisé des mots de passe.
+ * </p>
+ *
  */
 @Service
 public class UserService
 {
     private final UserRepository userRepository;
 
-    // Outil fourni par Spring pour chiffrer les mots de passe
+    /**
+     * Outil fourni par Spring Security pour chiffrer les mots de passe avec BCrypt.
+     */
     private final PasswordEncoder passwordEncoder;
 
-    // Injecte le repository et le PasswordEncoder
+    /**
+     * Constructeur avec injection des dépendances.
+     *
+     * @param userRepository  le repository pour accéder aux données utilisateur
+     * @param passwordEncoder l'encodeur pour hacher les mots de passe
+     */
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder)
     {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Crée un nouvel utilisateur après vérification de l'unicité.
+     * <p>
+     * Vérifie que l'email et le username ne sont pas déjà utilisés.
+     * Hash le mot de passe avec BCrypt avant stockage.
+     * </p>
+     *
+     * @param request les données d'inscription (email, username, mot de passe)
+     * @return l'utilisateur créé et sauvegardé en base
+     * @throws IllegalArgumentException si l'email ou le username existe déjà
+     */
     @Transactional
     public User createUser(RegisterRequest request)
     {
@@ -55,7 +80,13 @@ public class UserService
     }
 
     /**
-     * Convertit une entité User en UserResponse
+     * Convertit une entité User en DTO UserResponse.
+     * <p>
+     * Formate les dates au format "yyyy/MM/dd" et inclut les abonnements.
+     * </p>
+     *
+     * @param user l'entité utilisateur à convertir
+     * @return le DTO de réponse avec les informations formatées
      */
     public UserResponse toResponse(User user)
     {
@@ -86,7 +117,13 @@ public class UserService
     }
 
     /**
-     * Convertit une entité Topic en TopicResponse (sans le champ subscribed)
+     * Convertit une entité Topic en TopicResponse (sans indicateur d'abonnement).
+     * <p>
+     * Utilisée pour formater les abonnements dans la réponse utilisateur.
+     * </p>
+     *
+     * @param topic l'entité topic à convertir
+     * @return le DTO de réponse du topic
      */
     private TopicResponse toTopicResponse(Topic topic)
     {
@@ -103,21 +140,36 @@ public class UserService
         return response;
     }
 
+    /**
+     * Recherche un utilisateur par son adresse email.
+     *
+     * @param email l'adresse email recherchée
+     * @return un Optional contenant l'utilisateur s'il existe, vide sinon
+     */
     public Optional<User> findByEmail(String email)
     {
-        // On délègue au repository pour récupérer l'utilisateur par email
         return userRepository.findByEmail(email);
     }
 
+    /**
+     * Recherche un utilisateur par son nom d'utilisateur.
+     *
+     * @param username le nom d'utilisateur recherché
+     * @return un Optional contenant l'utilisateur s'il existe, vide sinon
+     */
     public Optional<User> findByUsername(String username)
     {
-        // On délègue au repository pour récupérer l'utilisateur par username
         return userRepository.findByUsername(username);
     }
 
+    /**
+     * Recherche un utilisateur par son identifiant.
+     *
+     * @param id l'identifiant de l'utilisateur
+     * @return un Optional contenant l'utilisateur s'il existe, vide sinon
+     */
     public Optional<User> findById(Long id)
     {
-        // Délègue au repository pour récupérer l'utilisateur par identifiant
         return userRepository.findById(id);
     }
 }

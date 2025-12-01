@@ -14,24 +14,58 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Ce filtre intercepte chaque requête pour vérifier la présence d'un jeton JWT
+ * Filtre d'authentification JWT pour Spring Security.
+ * <p>
+ * Intercepte chaque requête HTTP pour extraire et valider le jeton JWT
+ * présent dans l'en-tête Authorization. Si le token est valide,
+ * l'utilisateur est authentifié dans le contexte Spring Security.
+ * </p>
+ * <p>
+ * Les endpoints publics (login, register) sont exclus de ce filtre.
+ * </p>
+ * <p>
+ * Exécuté une seule fois par requête grâce à {@link OncePerRequestFilter}.
+ * </p>
+ *
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter
 {
     private final CustomUserDetailsService userDetailsService;
 
-    // Service qui gère la lecture et la validation des jetons
+    /**
+     * Service pour gérer la création et la validation des jetons JWT.
+     */
     private final JwtService jwtService;
 
-    // Injecte les services
+    /**
+     * Constructeur avec injection des services.
+     *
+     * @param userDetailsService le service pour charger les utilisateurs
+     * @param jwtService         le service JWT
+     */
     public JwtAuthenticationFilter(CustomUserDetailsService userDetailsService, JwtService jwtService)
     {
         this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
     }
 
-    // Méthode appelée pour chaque requête HTTP
+    /**
+     * Filtre exécuté pour chaque requête HTTP.
+     * <p>
+     * Extrait le JWT de l'en-tête Authorization, le valide, et authentifie
+     * l'utilisateur dans le contexte Spring Security si le token est valide.
+     * </p>
+     * <p>
+     * Les endpoints publics (login, register, actuator) sont exclus.
+     * </p>
+     *
+     * @param request     la requête HTTP entrante
+     * @param response    la réponse HTTP
+     * @param filterChain la chaîne de filtres à continuer
+     * @throws ServletException en cas d'erreur de traitement
+     * @throws IOException      en cas d'erreur d'E/S
+     */
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException
     {
@@ -42,9 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter
         // Vérifie si c'est un endpoint public (login et register, pas /me)
         if ((requestPath.equals("/api/auth/login") || requestURI.equals("/api/auth/login")) ||
             (requestPath.equals("/api/auth/register") || requestURI.equals("/api/auth/register")) ||
-            requestPath.startsWith("/actuator/") || requestURI.startsWith("/actuator/") ||
-            requestPath.startsWith("/swagger-ui") || requestURI.startsWith("/swagger-ui") ||
-            requestPath.startsWith("/v3/api-docs") || requestURI.startsWith("/v3/api-docs"))
+            requestPath.startsWith("/actuator/") || requestURI.startsWith("/actuator/"))
         {
             filterChain.doFilter(request, response);
             return;

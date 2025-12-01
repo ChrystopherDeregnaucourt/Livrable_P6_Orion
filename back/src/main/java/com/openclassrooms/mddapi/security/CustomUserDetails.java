@@ -7,85 +7,140 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * Cette classe adapte notre entité User au format attendu par Spring Security
- * 
- * Les méthodes suivantes ne sont pas encore gérées (A faire si j'ai le temps :) )
- * - isAccountNonExpired
- * - isAccountNonLocked
- * - isCredentialsNonExpired
- * - isEnabled
+ * Adaptateur pour l'entité User vers l'interface UserDetails de Spring Security.
+ * <p>
+ * Permet à Spring Security d'utiliser notre entité {@link User} personnalisée
+ * tout en respectant le contrat {@link UserDetails}.
+ * </p>
+ * <p>
+ * Note : Les fonctionnalités avancées (expiration de compte, verrouillage, etc.)
+ * ne sont pas implémentées pour le moment et retournent toujours true.
+ * </p>
+ *
  */
 public class CustomUserDetails implements UserDetails
 {
-    // Entity user
+    /**
+     * Entité utilisateur encapsulée.
+     */
     private final User user;
     
+    /**
+     * Constructeur avec l'entité User.
+     *
+     * @param user l'entité utilisateur à encapsuler
+     */
     public CustomUserDetails(User user)
     {
         this.user = user;
     }
 
-    // Méthode qui retourne les rôles (vide pour le moment)
+    /**
+     * Retourne les autorités (rôles) de l'utilisateur.
+     * <p>
+     * Non implémenté actuellement - retourne une liste vide.
+     * </p>
+     *
+     * @return une collection vide d'autorités
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities()
     {
-        // Pas géré
         return Collections.emptyList();
     }
 
+    /**
+     * Retourne le mot de passe hashé de l'utilisateur.
+     *
+     * @return le mot de passe hashé avec BCrypt
+     */
     @Override
     public String getPassword()
     {
-        // On renvoie le mot de passe chiffré de l'utilisateur
         return user.getPassword();
     }
 
+    /**
+     * Retourne l'email de l'utilisateur (utilisé comme username).
+     *
+     * @return l'email qui sert d'identifiant de connexion
+     */
     @Override
     public String getUsername()
     {
-        // On renvoie l'email qui sert d'identifiant de connexion
         return user.getEmail();
     }
 
-    // Méthode qui indique si le compte est expiré
+    /**
+     * Indique si le compte utilisateur est expiré.
+     * <p>
+     * Non implémenté - retourne toujours true.
+     * </p>
+     *
+     * @return true (le compte n'expire jamais)
+     */
     @Override
     public boolean isAccountNonExpired()
     {
-        // Pas géré
         return true;
     }
 
-    // Méthode qui indique si le compte est verrouillé
+    /**
+     * Indique si le compte utilisateur est verrouillé.
+     * <p>
+     * Non implémenté - retourne toujours true.
+     * </p>
+     *
+     * @return true (le compte n'est jamais verrouillé)
+     */
     @Override
     public boolean isAccountNonLocked()
     {
-        // Pas géré
         return true;
     }
 
-    // Méthode qui indique si les identifiants ont expiré
+    /**
+     * Indique si les credentials de l'utilisateur sont expirés.
+     * <p>
+     * Non implémenté - retourne toujours true.
+     * </p>
+     *
+     * @return true (les credentials n'expirent jamais)
+     */
     @Override
     public boolean isCredentialsNonExpired()
     {
-        // Pas géré
         return true;
     }
 
-    // Méthode qui indique si le compte est activé
+    /**
+     * Indique si le compte utilisateur est activé.
+     * <p>
+     * Non implémenté - retourne toujours true.
+     * </p>
+     *
+     * @return true (le compte est toujours activé)
+     */
     @Override
     public boolean isEnabled()
     {
-        // Pas géré
         return true;
     }
 
+    /**
+     * Retourne l'entité User encapsulée.
+     *
+     * @return l'entité utilisateur
+     */
     public User getUser()
     {
         return user;
     }
 
     /**
-     * Récupère l'ID de l'utilisateur
+     * Récupère l'identifiant de l'utilisateur.
+     *
+     * @return l'ID de l'utilisateur
      */
     public Long getId()
     {

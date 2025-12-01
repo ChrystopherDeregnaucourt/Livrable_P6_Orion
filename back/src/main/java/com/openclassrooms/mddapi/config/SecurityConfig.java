@@ -22,28 +22,66 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
- * Cette classe configure la sécurité HTTP et l'authentification
+ * Configuration de la sécurité Spring Security pour l'application.
+ * <p>
+ * Définit :
+ * </p>
+ * <ul>
+ *   <li>Les règles d'accès aux endpoints (publics vs protégés)</li>
+ *   <li>L'authentification JWT via un filtre personnalisé</li>
+ *   <li>La configuration CORS</li>
+ *   <li>Le mode de session stateless (sans session serveur)</li>
+ *   <li>L'encodage des mots de passe avec BCrypt</li>
+ * </ul>
+ * <p>
+ * Les endpoints publics : /api/auth/register, /api/auth/login, /actuator/**
+ * </p>
+ *
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig
 {
-    // Service qui charge les utilisateurs depuis la base
+    /**
+     * Service pour charger les utilisateurs depuis la base de données.
+     */
     private final CustomUserDetailsService userDetailsService;
 
-    // Filtre qui gère l'extraction et la validation des jetons JWT
+    /**
+     * Filtre JWT personnalisé pour extraire et valider les tokens.
+     */
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Value("${app.cors.allowed-origins:http://localhost:4200}")//Valeur par défaut pour dev pour l'origine
+    /**
+     * Origines autorisées pour CORS (injectées depuis application.properties).
+     * Valeur par défaut : http://localhost:4200
+     */
+    @Value("${app.cors.allowed-origins:http://localhost:4200}")
     private String[] allowedOrigins;
 
+    /**
+     * Constructeur avec injection des dépendances.
+     *
+     * @param userDetailsService       le service pour charger les utilisateurs
+     * @param jwtAuthenticationFilter  le filtre d'authentification JWT
+     */
     public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter)
     {
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    // Définit comment les requêtes HTTP sont sécurisées
+    /**
+     * Configure la chaîne de filtres de sécurité HTTP.
+     * <p>
+     * Définit les règles d'autorisation, désactive CSRF (non nécessaire en mode stateless),
+     * active CORS, configure le mode session stateless, et ajoute le filtre JWT.
+     * </p>
+     *
+     * @param http l'objet HttpSecurity pour configurer la sécurité
+     * @return la chaîne de filtres configurée
+     * @throws Exception en cas d'erreur de configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
@@ -69,15 +107,29 @@ public class SecurityConfig
         return http.build();
     }
 
-    // Chiffrement des mots de passe
+    /**
+     * Bean pour l'encodage sécurisé des mots de passe.
+     * <p>
+     * Utilise BCrypt, un algorithme de hashage unidirectionnel adapté
+     * pour les mots de passe.
+     * </p>
+     *
+     * @return l'encodeur de mots de passe BCrypt
+     */
     @Bean
     public PasswordEncoder passwordEncoder()
     {
-        // On utilise BCrypt pour hacher les mots de passe de manière sécurisée
         return new BCryptPasswordEncoder();
     }
 
-    // Bean qui relie le service utilisateur à l'authentification Spring
+    /**
+     * Bean pour le provider d'authentification basé sur la base de données.
+     * <p>
+     * Configure le service de chargement des utilisateurs et l'encodeur de mots de passe.
+     * </p>
+     *
+     * @return le provider d'authentification configuré
+     */
     @Bean
     @SuppressWarnings("deprecation")
     public DaoAuthenticationProvider authenticationProvider()
@@ -94,15 +146,32 @@ public class SecurityConfig
         return provider;
     }
 
-    // Bean qui expose l'AuthenticationManager nécessaire pour la connexion
+    /**
+     * Bean pour l'AuthenticationManager de Spring Security.
+     * <p>
+     * Requis pour l'authentification programmatique (ex: lors du login).
+     * </p>
+     *
+     * @param configuration la configuration d'authentification
+     * @return le gestionnaire d'authentification
+     * @throws Exception en cas d'erreur de configuration
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception
     {
-        // On délègue à Spring la création de l'AuthenticationManager
         return configuration.getAuthenticationManager();
     }
 
-    // Configuration CORS pour autoriser les requêtes depuis différentes origines
+    /**
+     * Configure CORS (Cross-Origin Resource Sharing) pour autoriser les requêtes
+     * depuis le front-end Angular.
+     * <p>
+     * En développement, accepte toutes les origines avec pattern.
+     * En production, doit être configuré avec des origines spécifiques.
+     * </p>
+     *
+     * @return la configuration CORS
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource()
     {

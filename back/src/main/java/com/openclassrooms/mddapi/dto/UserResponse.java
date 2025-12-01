@@ -4,20 +4,46 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * DTO pour la réponse utilisateur
+ * DTO de réponse contenant les informations d'un utilisateur.
+ * <p>
+ * Utilisé pour exposer les données utilisateur au client sans révéler
+ * d'informations sensibles (comme le mot de passe hashé).
+ * Inclut la liste des topics auxquels l'utilisateur est abonné.
+ * </p>
+ *
  */
 public class UserResponse
 {
+    /**
+     * Identifiant unique de l'utilisateur.
+     */
     private Long id;
+    
+    /**
+     * Adresse email de l'utilisateur.
+     */
     private String email;
+    
+    /**
+     * Nom d'utilisateur affiché publiquement.
+     */
     private String username;
 
+    /**
+     * Date de création du compte au format "yyyy/MM/dd".
+     */
     @JsonProperty("created_at")
     private String createdAt;
 
+    /**
+     * Date de dernière modification du profil au format "yyyy/MM/dd".
+     */
     @JsonProperty("updated_at")
     private String updatedAt;
 
+    /**
+     * Liste des topics auxquels l'utilisateur est abonné.
+     */
     private List<TopicResponse> subscriptions;
 
     public Long getId()

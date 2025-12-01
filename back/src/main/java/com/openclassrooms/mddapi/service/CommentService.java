@@ -15,7 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service pour la gestion des commentaires
+ * Service de gestion des commentaires.
+ * <p>
+ * Gère la création, la recherche et la conversion des commentaires.
+ * Coordonne avec UserService et PostRepository pour obtenir les données
+ * complètes des commentaires.
+ * </p>
+ *
  */
 @Service
 public class CommentService
@@ -24,6 +30,13 @@ public class CommentService
     private final PostRepository postRepository;
     private final UserService userService;
 
+    /**
+     * Constructeur avec injection des dépendances.
+     *
+     * @param commentRepository le repository pour accéder aux données des commentaires
+     * @param postRepository    le repository pour accéder aux données des posts
+     * @param userService       le service pour gérer les utilisateurs
+     */
     public CommentService(CommentRepository commentRepository, PostRepository postRepository, UserService userService)
     {
         this.commentRepository = commentRepository;
@@ -32,7 +45,12 @@ public class CommentService
     }
 
     /**
-     * Crée un nouveau commentaire
+     * Crée un nouveau commentaire sur un post.
+     *
+     * @param request  les données du commentaire (contenu, postId)
+     * @param authorId l'identifiant de l'auteur du commentaire
+     * @return le DTO du commentaire créé
+     * @throws IllegalArgumentException si l'utilisateur ou le post n'existe pas
      */
     @Transactional
     public CommentResponse createComment(CommentRequest request, Long authorId)
@@ -54,7 +72,10 @@ public class CommentService
     }
 
     /**
-     * Récupère les commentaires d'un article spécifique
+     * Récupère tous les commentaires d'un post spécifique.
+     *
+     * @param postId l'identifiant du post
+     * @return la liste des commentaires du post
      */
     public List<CommentResponse> getCommentsByPost(Long postId)
     {
@@ -65,7 +86,10 @@ public class CommentService
     }
 
     /**
-     * Convertit une entité Comment en CommentResponse
+     * Convertit une entité Comment en CommentResponse.
+     *
+     * @param comment l'entité commentaire à convertir
+     * @return le DTO de réponse
      */
     public CommentResponse toResponse(Comment comment)
     {
