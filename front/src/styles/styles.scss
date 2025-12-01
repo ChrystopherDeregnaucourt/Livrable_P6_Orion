@@ -1,0 +1,18 @@
+/* You can add global styles to this file, and also import other style files */
+
+// Import des styles partagés pour les pages de formulaires
+@import 'form-pages';
+
+// Import des styles partagés pour les pages avec navigation
+@import 'nav-pages';
+
+// Import des styles partagés pour les cartes/tuiles
+@import 'cards';
+
+html, body { height: 100%; }
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+  overflow-x: hidden;
+  max-width: 100%;
+}

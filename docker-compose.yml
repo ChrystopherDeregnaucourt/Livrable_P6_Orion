@@ -1,0 +1,24 @@
+services:
+  # Base de données MySQL uniquement
+  mysql:
+    image: mysql:8.0
+    container_name: mdd-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mdd
+      MYSQL_USER: mdd_user
+      MYSQL_PASSWORD: mdd_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  mysql-data:

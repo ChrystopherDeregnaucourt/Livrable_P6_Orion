@@ -1,0 +1,517 @@
+{
+  "data": [
+    {
+      "uuid": "5d5a6e43-4d92-4e75-9d85-8c3c6bc881bc",
+      "name": "MDD API",
+      "id": "pbo6",
+      "documentation": "Configuration Mockoon pour simuler l'API MDD - Réseau de développeurs",
+      "value": "[\n]"
+    }
+  ],
+  "uuid": "c272fbd7-79e9-43db-b1b8-dd961627d62e",
+  "lastMigration": 33,
+  "name": "MDD API Mock Environment",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 3001,
+  "hostname": "",
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "2163052c-3f8b-4407-be66-656b0e1ae082"
+    },
+    {
+      "type": "route",
+      "uuid": "aa50e536-9601-48f2-8a91-390195f0e753"
+    },
+    {
+      "type": "route",
+      "uuid": "7c1867a3-2745-486f-9f71-58e2a3bb4ef0"
+    },
+    {
+      "type": "route",
+      "uuid": "fdbd2f56-180f-4f1b-ad3c-b3274513dd4b"
+    },
+    {
+      "type": "route",
+      "uuid": "eff8928a-b0d3-4843-b311-dbefd107b667"
+    },
+    {
+      "type": "route",
+      "uuid": "c10a952c-e8c7-44b8-a2ef-fea747492b9c"
+    },
+    {
+      "type": "route",
+      "uuid": "54dad960-60ce-4386-96ee-3fa55b42db83"
+    },
+    {
+      "type": "route",
+      "uuid": "cb8d31f5-d824-4d3c-beda-5486e8a424df"
+    },
+    {
+      "type": "route",
+      "uuid": "53297c92-5fae-4400-9d18-53588b5cdc7b"
+    },
+    {
+      "type": "route",
+      "uuid": "7420a448-e33a-412d-ba8c-2a6043c37b1b"
+    },
+    {
+      "type": "route",
+      "uuid": "e3a70f80-a395-4cab-b7a9-ed89076a20a0"
+    }
+  ],
+  "folders": [],
+  "routes": [
+    {
+      "uuid": "2163052c-3f8b-4407-be66-656b0e1ae082",
+      "type": "http",
+      "documentation": "Connexion utilisateur - Retourne un token JWT",
+      "method": "post",
+      "endpoint": "auth/login",
+      "responses": [
+        {
+          "uuid": "cbc209e6-c050-4c90-8339-3c12baa00bac",
+          "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJqb2huZG9lIiwiZW1haWwiOiJqb2huQGV4YW1wbGUuY29tIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"user\": {\n    \"id\": 1,\n    \"username\": \"johndoe\",\n    \"email\": \"john@example.com\"\n  }\n}",
+          "statusCode": 200,
+          "label": "Connexion réussie",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        },
+        {
+          "uuid": "04f3a7f9-68d3-4f57-93fe-0cccb730fc1d",
+          "body": "{\n  \"error\": \"Identifiants invalides\",\n  \"message\": \"Email ou mot de passe incorrect\"\n}",
+          "statusCode": 401,
+          "label": "Identifiants invalides",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "aa50e536-9601-48f2-8a91-390195f0e753",
+      "type": "http",
+      "documentation": "Inscription utilisateur",
+      "method": "post",
+      "endpoint": "auth/register",
+      "responses": [
+        {
+          "uuid": "ca51e383-3b2b-4d78-bc0f-aa1a8c1ee928",
+          "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwidXNlcm5hbWUiOiJuZXd1c2VyIiwiZW1haWwiOiJuZXdAZXhhbXBsZS5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.xxx\",\n  \"user\": {\n    \"id\": 2,\n    \"username\": \"{{body 'username'}}\",\n    \"email\": \"{{body 'email'}}\"\n  }\n}",
+          "statusCode": 201,
+          "label": "Inscription réussie",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "7c1867a3-2745-486f-9f71-58e2a3bb4ef0",
+      "type": "http",
+      "documentation": "Récupération des informations du profil utilisateur connecté",
+      "method": "get",
+      "endpoint": "auth/me",
+      "responses": [
+        {
+          "uuid": "4e7903b2-fb91-405a-80d0-ea7d05437680",
+          "body": "{\n  \"id\": 1,\n  \"username\": \"johndoe\",\n  \"email\": \"john@example.com\",\n  \"createdAt\": \"2024-01-15T10:30:00Z\",\n  \"subscriptions\": [\n    {\n      \"id\": 1,\n      \"title\": \"Java & Spring\",\n      \"description\": \"Tout sur le développement Java et l'écosystème Spring Framework\"\n    },\n    {\n      \"id\": 2,\n      \"title\": \"JavaScript & Angular\",\n      \"description\": \"Les meilleures pratiques JavaScript et Angular pour vos applications web\"\n    }\n  ]\n}",
+          "statusCode": 200,
+          "label": "Profil utilisateur",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "fdbd2f56-180f-4f1b-ad3c-b3274513dd4b",
+      "type": "http",
+      "documentation": "Mise à jour du profil utilisateur",
+      "method": "put",
+      "endpoint": "auth/me",
+      "responses": [
+        {
+          "uuid": "b81db92e-9f51-4fff-bc3d-420a12878675",
+          "body": "{\n  \"id\": 1,\n  \"username\": \"{{body 'username'}}\",\n  \"email\": \"{{body 'email'}}\",\n  \"updatedAt\": \"{{now}}\"\n}",
+          "statusCode": 200,
+          "label": "Profil mis à jour",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "eff8928a-b0d3-4843-b311-dbefd107b667",
+      "type": "http",
+      "documentation": "Liste de tous les articles",
+      "method": "get",
+      "endpoint": "articles",
+      "responses": [
+        {
+          "uuid": "f2d5ebf3-7f95-48c8-a344-e97419eef109",
+          "body": "[\n  {\n    \"id\": 1,\n    \"title\": \"Introduction à Spring Boot 3\",\n    \"content\": \"Spring Boot 3 apporte de nombreuses nouveautés avec le support de Java 17 et Jakarta EE...\",\n    \"author\": \"johndoe\",\n    \"date\": \"2024-11-15T14:30:00Z\",\n    \"theme\": \"Java & Spring\"\n  },\n  {\n    \"id\": 2,\n    \"title\": \"Les hooks Angular 18\",\n    \"content\": \"Angular 18 introduit de nouveaux hooks pour améliorer la gestion du cycle de vie des composants...\",\n    \"author\": \"janedoe\",\n    \"date\": \"2024-11-16T09:15:00Z\",\n    \"theme\": \"JavaScript & Angular\"\n  },\n  {\n    \"id\": 3,\n    \"title\": \"Sécurité avec JWT\",\n    \"content\": \"Implémentation d'une authentification JWT dans une application Spring Boot...\",\n    \"author\": \"securitypro\",\n    \"date\": \"2024-11-17T16:45:00Z\",\n    \"theme\": \"Sécurité\"\n  },\n  {\n    \"id\": 4,\n    \"title\": \"Docker pour les développeurs\",\n    \"content\": \"Guide complet pour containeriser vos applications avec Docker et Docker Compose...\",\n    \"author\": \"devopsguru\",\n    \"date\": \"2024-11-18T11:20:00Z\",\n    \"theme\": \"DevOps\"\n  }\n]",
+          "statusCode": 200,
+          "label": "Liste des articles",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "pbo6",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "c10a952c-e8c7-44b8-a2ef-fea747492b9c",
+      "type": "http",
+      "documentation": "Détail d'un article avec ses commentaires",
+      "method": "get",
+      "endpoint": "articles/:id",
+      "responses": [
+        {
+          "uuid": "a32cc7cd-db1f-4581-a9a2-9710b03fc0ae",
+          "body": "{\n  \"id\": {{urlParam 'id'}},\n  \"title\": \"Introduction à Spring Boot 3\",\n  \"content\": \"Spring Boot 3 apporte de nombreuses nouveautés avec le support de Java 17 et Jakarta EE. Cette nouvelle version majeure marque un tournant important dans l'écosystème Spring en adoptant les spécifications Jakarta EE 9+. Les développeurs bénéficient désormais d'une meilleure performance grâce à l'optimisation du démarrage et de la consommation mémoire. L'intégration native avec GraalVM permet également de créer des images natives pour des temps de démarrage ultra-rapides.\",\n  \"author\": \"johndoe\",\n  \"date\": \"2024-11-15T14:30:00Z\",\n  \"theme\": \"Java & Spring\",\n  \"comments\": [\n    {\n      \"id\": 1,\n      \"username\": \"janedoe\",\n      \"content\": \"Excellent article ! Très clair et bien détaillé.\"\n    },\n    {\n      \"id\": 2,\n      \"username\": \"devjunior\",\n      \"content\": \"Merci pour ces explications, ça m'aide beaucoup pour mon projet.\"\n    },\n    {\n      \"id\": 3,\n      \"username\": \"techexpert\",\n      \"content\": \"Petite suggestion : pourriez-vous ajouter un exemple avec GraalVM ?\"\n    }\n  ]\n}",
+          "statusCode": 200,
+          "label": "Détail de l'article",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "54dad960-60ce-4386-96ee-3fa55b42db83",
+      "type": "http",
+      "documentation": "Création d'un nouvel article",
+      "method": "post",
+      "endpoint": "articles",
+      "responses": [
+        {
+          "uuid": "ba21c515-075b-4f33-91c4-55d66db8edd2",
+          "body": "{\n  \"id\": {{faker 'datatype.number' min=5 max=999}},\n  \"title\": \"{{body 'title'}}\",\n  \"content\": \"{{body 'content'}}\",\n  \"author\": \"johndoe\",\n  \"date\": \"{{now}}\",\n  \"theme\": \"{{body 'theme'}}\",\n  \"comments\": []\n}",
+          "statusCode": 201,
+          "label": "Article créé",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "cb8d31f5-d824-4d3c-beda-5486e8a424df",
+      "type": "http",
+      "documentation": "Liste de tous les thèmes/topics disponibles",
+      "method": "get",
+      "endpoint": "topics",
+      "responses": [
+        {
+          "uuid": "717bfd4e-60c2-44cf-8e1f-69c5e5b02cdd",
+          "body": "[\n  {\n    \"id\": 1,\n    \"title\": \"Java & Spring\",\n    \"description\": \"Tout sur le développement Java et l'écosystème Spring Framework. Apprenez les meilleures pratiques et les nouveautés.\",\n    \"isSubscribed\": true\n  },\n  {\n    \"id\": 2,\n    \"title\": \"JavaScript & Angular\",\n    \"description\": \"Les meilleures pratiques JavaScript et Angular pour vos applications web modernes et performantes.\",\n    \"isSubscribed\": true\n  },\n  {\n    \"id\": 3,\n    \"title\": \"Sécurité\",\n    \"description\": \"Sécurisez vos applications web : authentification, autorisation, JWT, OAuth2 et bien plus encore.\",\n    \"isSubscribed\": false\n  },\n  {\n    \"id\": 4,\n    \"title\": \"DevOps\",\n    \"description\": \"CI/CD, Docker, Kubernetes, monitoring et toutes les pratiques DevOps pour optimiser vos déploiements.\",\n    \"isSubscribed\": false\n  },\n  {\n    \"id\": 5,\n    \"title\": \"Base de données\",\n    \"description\": \"SQL, NoSQL, optimisation des requêtes, architecture de données et gestion de la persistance.\",\n    \"isSubscribed\": false\n  },\n  {\n    \"id\": 6,\n    \"title\": \"Architecture logicielle\",\n    \"description\": \"Design patterns, microservices, architecture hexagonale et clean architecture pour des applications maintenables.\",\n    \"isSubscribed\": false\n  }\n]",
+          "statusCode": 200,
+          "label": "Liste des thèmes",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "53297c92-5fae-4400-9d18-53588b5cdc7b",
+      "type": "http",
+      "documentation": "S'abonner à un thème",
+      "method": "post",
+      "endpoint": "topics/:id/subscribe",
+      "responses": [
+        {
+          "uuid": "53caafd0-ccf0-4c60-bf8b-296808573a9b",
+          "body": "{\n  \"message\": \"Abonnement au thème réussi\",\n  \"topicId\": {{urlParam 'id'}},\n  \"subscribed\": true\n}",
+          "statusCode": 200,
+          "label": "Abonnement réussi",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "7420a448-e33a-412d-ba8c-2a6043c37b1b",
+      "type": "http",
+      "documentation": "Se désabonner d'un thème",
+      "method": "delete",
+      "endpoint": "topics/:id/subscribe",
+      "responses": [
+        {
+          "uuid": "8dec31a8-c6bb-4de1-a233-49e7a1d5c3bf",
+          "body": "{\n  \"message\": \"Désabonnement du thème réussi\",\n  \"topicId\": {{urlParam 'id'}},\n  \"subscribed\": false\n}",
+          "statusCode": 200,
+          "label": "Désabonnement réussi",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "e3a70f80-a395-4cab-b7a9-ed89076a20a0",
+      "type": "http",
+      "documentation": "Ajouter un commentaire à un article",
+      "method": "post",
+      "endpoint": "articles/:id/comments",
+      "responses": [
+        {
+          "uuid": "0d88b5b1-0455-4a91-94de-60c2b75f4cfb",
+          "body": "{\n  \"id\": {{faker 'datatype.number' min=10 max=999}},\n  \"username\": \"johndoe\",\n  \"content\": \"{{body 'content'}}\",\n  \"createdAt\": \"{{now}}\"\n}",
+          "statusCode": 201,
+          "label": "Commentaire ajouté",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "latency": 0,
+          "bodyType": "INLINE",
+          "databucketID": "",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET,POST,PUT,DELETE,OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type,Authorization"
+    }
+  ],
+  "proxyReqHeaders": [],
+  "proxyResHeaders": [],
+  "callbacks": []
+}

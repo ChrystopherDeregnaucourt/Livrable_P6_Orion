@@ -1,0 +1,53 @@
+<div class="form-page-container">
+  <!-- Header avec logo et ligne - toute la largeur -->
+  <div class="form-page-header-bar">
+    <div class="form-page-logo-section">
+      <img src="/assets/logo_p6.png" alt="MDD Logo" class="form-page-logo" />
+    </div>
+    <div class="form-page-divider"></div>
+    <div class="form-page-back-button-section">
+      <button mat-icon-button class="back-btn" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Contenu du formulaire - centré -->
+  <div class="form-page-content-wrapper">
+    <div class="form-page-content-section">
+      <h2 class="form-page-title">Se connecter</h2>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-page-form">
+        <div class="form-page-field">
+          <label for="emailOrUsername">E-mail ou nom d'utilisateur</label>
+          <input
+            type="text"
+            id="emailOrUsername"
+            formControlName="emailOrUsername"
+            class="form-page-input"
+          />
+        </div>
+
+        <div class="form-page-field">
+          <label for="password">Mot de passe</label>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            class="form-page-input"
+          />
+        </div>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="form-page-submit-button"
+          [disabled]="!loginForm.valid"
+        >
+          Se connecter
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
